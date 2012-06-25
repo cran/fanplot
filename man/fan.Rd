@@ -1,0 +1,115 @@
+\name{fan}
+\alias{fan}
+\title{
+Fan Plot of Distributions Percentiles Over Time.
+}
+\description{
+Plots percentiles of sequential distributions provided by \code{\link{pn}} object. Typically called after the plot area has been set.
+}
+\usage{
+fan(psims, fan.col = heat.colors(floor(dim(psims)[2]/2)), 
+      ln.col = fan.col[1], ln = NULL, txt = NULL, ...)
+}
+\arguments{
+  \item{psims}{
+\code{pn} object created by the \code{\link{pn}} function.
+}
+  \item{fan.col}{
+Palette of colours used in the fan plot
+}
+  \item{ln.col}{
+Line colour to be imposed on top of the fan
+}
+  \item{ln}{
+Vector of number to plot contour lines on top the fan. Must correspond to calculated percentiles in  \code{psims}
+}
+  \item{txt}{
+Vector of number to plot text at the end of corresponding percentiles. Must be in calculated percentiles of \code{psims}.
+}
+  \item{\dots}{
+Additional arguments passed to \code{lines}.
+}
+}
+\details{
+Returns a plot of the percentiles given in the \code{psims} argument. Additional lines and text are added to illustrate major contours on the probability distribution. By default these run on every decile. Text is automatically added where lines are drawn. Hence, if text is only required where there are contour lines, there is no need to specify anything in the \code{txt} argument. Text can also be suppressed and added later using \code{\link{fan.txt}}. Lines can be suppressed by adding \code{type = "n"} as an additional argument to be passed to line characteristics. Colours are by default taken from the \code{heat.colors} palette. Alternatives can be specified using \code{fan.col}. The joining of a forecast fan to data is controlled be the anchor argument in the \code{\link{pn}} function.
+}
+\value{
+See Details
+}
+\author{
+Guy J. Abel
+}
+
+\seealso{
+\code{\link{pn}}, \code{\link{fan.txt}}, \code{\link{fan.fill}}
+}
+\examples{
+# calculate percentiles across time
+th.pn <- pn(sims = th.mcmc)
+
+##
+##Default
+##
+# empty plot
+plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)),  ylim = range(th.pn), ylab = "Theta")
+
+# add fan
+fan(th.pn)
+
+##
+##No text (can be added later with fan.txt)
+##
+# empty plot
+plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)),  ylim = range(th.pn), ylab = "Theta")
+
+# fan with no text
+fan(th.pn, txt = NA)
+
+
+##
+##Text at both ends and lines also at 1st and 99th percentiles
+##
+# empty plot
+plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), ylab = "Theta")
+
+# fan with no text
+fan(th.pn, ln = c(1, seq(10, 90, 20), 99), txt = NA)
+
+# add text
+fan.txt(th.pn, pn.l = c(1, 10, 50, 90, 99))
+fan.txt(th.pn, pn.r = c(1, seq(10, 90, 20), 99))
+
+##
+##No lines or text
+##
+plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), ylab = "Theta")
+fan(th.pn, ln = c(1, seq(10, 90, 20), 99), txt = NA, type="n")
+
+##
+##Different colours
+##
+sigma.pn <- pn(sims = sqrt(exp(th.mcmc)))
+
+pal <- colorRampPalette(c("royalblue", "grey", "white"))
+fancol <- pal(dim(sigma.pn)[2]/2)
+
+plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(sigma.pn), 
+     ylab = "Standard Deviation")
+fan(sigma.pn, fan.col = fancol, ln = c(1, 10, 50, 90, 99))
+
+##
+##Forecast fans 1) default 2) coarser colours, different contour line colour and anchoring fan
+##
+pnew.mcmc <- ew.mcmc$sims.list$p.new
+h0 <- end(ew)[1]
+pnew.pn <- pn(sims = pnew.mcmc/1e+06, ts = TRUE, start = h0 + 1)
+pnew.pn2 <- pn(sims = pnew.mcmc/1e+06, p = c(1, 10, 40, 50), 
+               anchor = tail(ew/1e+06, 1), ts = TRUE, start = h0) 
+
+par(mfrow = c(1 ,2), mar = c(4, 2, 2, 2))
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Time", lwd = 2)
+fan(pnew.pn)
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Time", lwd = 2)
+fan(pnew.pn2, ln.col = "black")
+}
+\keyword{ aplot }

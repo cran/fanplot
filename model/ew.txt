@@ -1,0 +1,40 @@
+ew.bug<-function(){
+#data manipulations
+for(t in 2:N){
+	y[t] <- r[t]-r[t-1]
+}
+
+#likelihood
+for(t in 2:N+H){
+	y[t] ~ dnorm(y.mean[t],isigma2[t])
+	y.mean[t] <- 0
+	isigma2[t] <- 1/exp(h[t])
+	h[t]~dnorm(h.mean[t], itau2);
+}
+h.mean[2] <- alpha
+for(t in 3:N+H){
+	h.mean[t] <- alpha + psi*(h[t-1]-alpha);
+}
+
+#priors 
+a ~ dgamma(0.000001,0.000001)
+alpha <- -log(a)
+psi ~ dunif(-0.999,0.999)
+itau2 ~ dgamma(0.01,0.01)
+tau <- 1/(pow(itau2,0.5))
+
+#forecasts
+r.new[N] <- r[N]
+p.new[N+1] <- p[N+1]
+for(t in N+1:N+H){
+	r.new[t] <- y[t] + r.new[t-1]
+	p.new[t+1] <- (1+r.new[t])*p.new[t]
+}
+
+#sims
+for(t in 2:N){
+	y.mean.c[t]<-cut(y.mean[t])
+	isigma2.c[t]<-cut(isigma2[t])
+	y.sim[t] ~ dnorm(y.mean.c[t],isigma2.c[t])
+}
+}
