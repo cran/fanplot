@@ -5,7 +5,7 @@
 Pound-Dollar Exchange Rate Data
 }
 \description{
-Pound-Dollar exchange rate data from 10th October 1981 to 28th June 1985.
+Pound-Dollar exchange rate data from 2nd October 1981 to 28th June 1985.
 }
 \usage{data(svpdx)}
 \format{
@@ -27,10 +27,14 @@ Meyer, R. and J. Yu (2000). BUGS for a Bayesian analysis of stochastic volatilit
 \examples{
 data(svpdx)
 
-plot(svpdx, type = "l", xaxt = "n", xlab = "Time", ylab = "Return")
-m <- seq(min(svpdx$date), max(svpdx$date), "months")
-q <- seq(min(svpdx$date), max(svpdx$date), "3 months")
-axis.Date(1, at = q, labels = format(q, "\%b \%y"),cex.axis = 0.9)
-axis.Date(1, at = m, labels = FALSE, tcl = -0.2)
+# plot
+plot(svpdx$pdx, type = "l", xaxt = "n", xlab = "Time", ylab = "Return")
+
+# add x-axis
+svpdx$rdate<-format(svpdx$date, format = "\%b \%Y")
+mth <- unique(svpdx$rdate)
+qtr <- mth[seq(1,length(mth),3)]
+axis(1, at = match(qtr, svpdx$rdate), labels = qtr, cex.axis = 0.75)
+axis(1, at = match(mth, svpdx$rdate), labels = FALSE, tcl = -0.2)
 }
 \keyword{datasets}

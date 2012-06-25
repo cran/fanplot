@@ -37,12 +37,13 @@ Guy J. Abel
 \code{\link{fan}}, \code{\link{pn}}, \code{\link{fan.txt}}
 }
 \examples{
-#calculate percentiles across time
+# calculate percentiles across time
 th.pn <- pn(sims = th.mcmc)
 
-#set up plot area
-plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), ylab = "Theta")
-#plot different colours and patterns of shading
+# set up plot area
+plot(svpdx$pdx, type = "n", xlim = c(0, 945), ylim = range(th.pn), ylab = "Theta")
+
+# plot different colours and patterns of shading
 fan.fill(th.pn[, "10\%"], th.pn[, "90\%"])
 fan.fill(th.pn[, "10\%"] + 1, th.pn[, "90\%"] + 2, "red")
 fan.fill(th.pn[, "10\%"] + 0, th.pn[, "90\%"] - 1, adjustcolor("red", 0.2))

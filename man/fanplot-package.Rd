@@ -5,10 +5,10 @@
 fanplot
 }
 \description{
-The fanplot package contains a collection of R functions to effectively display plots of probabilistic forecasts, and other types of distributions, that may develop along an x-axis of a plot.
+The fanplot package contains a collection of R functions to effectively display plots of sequential distributions such as probabilistic forecasts or posterior distrubtions of volatilty estimates.
 }
 \details{
-The plotting of these distributions are based around two functions. The first function, pn, calculates the percentiles over a time period or form of index represented on an x-axis for a given distribution of results. These distributions typically come from some form of simulation. The second function fan, plots the calculated percentiles of the distribution.
+ The plotting of distributions are based around two functions. The first, pn, calculates the percentiles for a set of sequential distributions over a specified time period. The second, fan, plots the calculated percentiles of the sequential distributions. The resulting plot is a set of coloured polygon, with shadings corresponding to the percentile values.
 }
 \author{
 Guy J. Abel
@@ -18,7 +18,7 @@ Guy J. Abel
 th.pn <- pn(sims = th.mcmc)
 
 # empty plot
-plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)),  ylim = range(th.pn), ylab = "Theta")
+plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
 
 # add fan
 fan(th.pn)

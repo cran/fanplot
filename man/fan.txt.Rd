@@ -37,7 +37,7 @@ Returns text labels in plot figure. Particularly useful if probability distribut
 See details
 }
 \author{
-Guy J Abel
+Guy J. Abel
 }
 
 \seealso{
@@ -50,18 +50,26 @@ th.pn <- pn(sims = th.mcmc)
 ##
 ##Add text
 ##
-plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), 
-  ylab = "Theta", xlab = "Time", xaxt = "n")
+# empty plot
+plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
+
+# add fan
 fan(th.pn, txt = NA)
+
+# add text
 fan.txt(th.pn, pn.l = c(1, 10, 50, 90, 99))
 fan.txt(th.pn, pn.r = c(1, seq(10, 90, 20), 99)) 
 
 ##
 ##Change text position, size and colour
 ##
-plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), 
-  ylab = "Theta", xlab = "Time", xaxt = "n")
+# empty plot
+plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
+
+# add fan
 fan(th.pn, txt = NA)
+
+# add text
 fan.txt(th.pn, pn.l = c(1, 10, 50, 90, 99), pos = 1, offset = 0)
 fan.txt(th.pn, pn.r = c(1, seq(10, 90, 20), 99), col = "royalblue", cex = 2) 
 }

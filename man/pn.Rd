@@ -7,7 +7,7 @@ Calculate Percentiles of Sequential Simulation Data
 Creates a \code{pn} object, the essential input object into the \code{\link{fan}} function, to plot sequential distrbution data.
 }
 \usage{
-pn(sims, p = 1:50, anchor = NULL, ts = FALSE, ...)
+pn(sims, p = 1:50, anchor = NULL, ...)
 }
 \arguments{
   \item{sims}{
@@ -19,11 +19,8 @@ Percentiles to be calculated, and later plotted using the \code{fan} function. T
   \item{anchor}{
 Optional data value to anchor a forecast fan on. Typically this will be the last observation of the observed data series.
 }
-  \item{ts}{
-Indicator value (TRUE or FALSE) to whether to assign \code{ts} type properties to output. Default set to FALSE.
-}
   \item{\dots}{
-Other arguments passed to create an \code{ts} type object, if \code{ts} = TRUE. Typically one should give a value for \code{start}.
+Other arguments passed to add \code{ts} type attiributes. Typically one should give a value for \code{start}.
 }
 }
 \details{
@@ -31,13 +28,13 @@ Returns a \code{pn} object, the basis of the \code{\link{fan}} function. The arg
 
 The \code{anchor} argument can be used if the simulation data need to be plotted to join up to a single point to create a funnel shape plot. The value of the anchor point should be given in argument. 
 
-The \code{ts} argument is set to allow the x-axis of a future plot to be based on a time series rather than a simple index number. This allows original \code{ts} data to be drawn alongside the fan plot. Other arguments should be added if \code{ts = TRUE} to create an \code{ts} type object (of class \code{pn}), such as a value for \code{start} and \code{frequency}.
+The \code{ts} argument is set to allow the x-axis of a future plot to be based on a time series rather than a simple index number. This allows original \code{ts} data to be drawn alongside the fan plot. Other arguments should be added if to create an \code{ts} type object (of class \code{pn}), such as a value for \code{start} and \code{frequency}.
 }
 \value{
 See details
 }
 \author{
-Guy J Abel
+Guy J. Abel
 }
 
 \seealso{
@@ -47,30 +44,44 @@ Guy J Abel
 ##
 ##Control coarseness of fan via pn
 ##
+# calculate percentiles across time
 th.pn <- pn(sims = th.mcmc)
 th.pn2 <- pn(sims = th.mcmc, p = c(1, 10, 40, 50))
 
-plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), 
-  ylab = "Theta")
+# empty plot
+plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
+
+# add fan
 fan(th.pn)
 
-plot(svpdx$pdx, type = "n", xlim = c(0, length(svpdx$pdx)), ylim = range(th.pn), 
-  ylab = "Theta")
+# empty plot
+plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
+
+# add coarser fan
 fan(th.pn2) 
 
 
 ##
 ##Forecast fans 1) default 2) coarser colours, different contour line colour and anchoring fan
 ##
-pnew.mcmc <- ew.mcmc$sims.list$p.new
+# calculate percentiles across time
 h0 <- end(ew)[1]
-pnew.pn <- pn(sims = pnew.mcmc/1e+06, ts = TRUE, start = h0 + 1)
+pnew.pn <- pn(sims = pnew.mcmc/1e+06, start = h0 + 1)
 pnew.pn2 <- pn(sims = pnew.mcmc/1e+06, p = c(1, 10, 40, 50), 
-               anchor = tail(ew/1e+06, 1), ts = TRUE, start = h0) 
+               anchor = tail(ew/1e+06, 1), start = h0) 
 
-par(mfrow = c(1 ,2), mar = c(4, 2, 2, 2))
-plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Time", lwd = 2)
+# plot pop
+par(mfrow = c(1 ,2))
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
+     ylab = "Population (m)", lwd = 2)
+     
+# add fan    
 fan(pnew.pn)
-plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Time", lwd = 2)
+
+# plot pop
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
+     ylab = "Population (m)", lwd = 2)
+     
+# add fan
 fan(pnew.pn2, ln.col = "black")
 }

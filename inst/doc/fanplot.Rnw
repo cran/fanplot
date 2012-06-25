@@ -1,0 +1,247 @@
+%\VignetteIndexEntry{fanplot}
+%\VignetteKeyword{Plot}
+%\VignetteKeyword{Time Series}
+%\VignetteKeyword{Distribution}
+%\VignetteKeyword{Visualisation}
+%\VignetteKeyword{Percentiles}
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{natbib}
+
+\title{Vignette for fanplot package}
+\author{Guy J. Abel\\
+Wittgenstein Centre (IIASA, VID/\"{O}AW, WU), \\Vienna Institute of Demography/Austrian Academy of Sciences\\
+g.j.abel@gmail.com\\
+}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\setkeys{Gin}{width=\textwidth}
+<<keep.source=FALSE, echo=FALSE>>=
+options(SweaveHooks=list(fig=function() par(mar=c(4,4,0.2,0))), continue=" ")
+@
+
+\maketitle
+
+\section{Introduction}
+The fanplot package contains a collection of R \citep{r2011man} functions to effectively display plots of sequential distributions such as probabilistic forecasts. The plotting of distributions are based around two functions. The first, \texttt{pn}, calculates the percentiles for a set of sequential distributions over a specified time period. The second, \texttt{fan}, plots the calculated percentiles of the sequential distributions. The resulting plot is a set of coloured polygon, with shadings corresponding to the percentile values.
+
+This document illustrates these two core functions using MCMC simulation results from fitted stochastic volatility models. These MCMC simulations can be recreated from data and BUGS models also contained in the fanplot package, via the R2OpenBUGS package of \citep{sturtz2005r2b}. These are first shown for \texttt{dataframe} type object where there is no time series type attributes, followed by plots based on a \texttt{ts} object.
+
+\section{Volatility Plots}
+To illustrate the basics of the fanplot package consider the (\texttt{svpdx}) data contained in the package. This contains information on the log return of the Pound-Dollar exchange rate from 2nd October 1981 to 28th June 1985. For a view of the first part of the data, use the \texttt{head} function, after loading the fanplot package.
+<<>>=
+library(fanplot)
+head(svpdx)
+@
+This data is a \texttt{dataframe} object, and is diffiuclt to express it as a standard \texttt{ts} object due to the irregular nature of the data. It is best plot initially without an x-axis, which can then be added later using the \texttt{axis} function:
+<<fig=TRUE, width=12, height=8>>=
+#plot
+plot(svpdx$pdx, type = "l", xaxt = "n", xlab = "Time", ylab = "Return")
+#x-axis
+svpdx$rdate<-format(svpdx$date, format = "%b %Y")
+mth <- unique(svpdx$rdate)
+qtr <- mth[seq(1,length(mth),3)]
+axis(1, at = match(qtr, svpdx$rdate), labels = qtr, cex.axis = 0.75)
+axis(1, at = match(mth, svpdx$rdate), labels = FALSE, tcl = -0.2)
+@
+
+\noindent If the \texttt{xaxt} argument was not used in the \texttt{plot} function and the labels not added later, the x-axis would be based on the row number of each observation in the \texttt{svpdx} data, i.e. an index sequence from 1 to 945. 
+
+To produce the x-axis with date information in the above code, a new column is added to \texttt{svpdx} for the month-year combination of each observation. Objects \texttt{mth} and \texttt{qtr} are then created to mark each month and quarter in the data series respectively. Major axis ticks are then plotted on the unseen 1 to 945 index for the beginning of every quarter with a corresponding label, whilst minor axis tick are also plotted for beginning of every month. 
+
+\cite{meyer2000bugs} used the above Pound-Dollar exchange rate data to fit various stochastic volatility models in WinBUGS \citep{lunn2000bugs}. The first stochastic model they fitted to the data is contained in \texttt{my1.txt} in the model directory of the fanplot package. The model of \cite{meyer2000bugs} can be refitted in BUGS via R, using the R2OpenBUGS package \citep{sturtz2005r2b}: 
+<<>>=
+library("R2OpenBUGS")
+# write model file:
+my1.bug <- dget(system.file("model", "my1.txt", package = "fanplot"))
+write.model(my1.bug, "my1.txt")
+# take a look:
+file.show("my1.txt")
+# run openbugs
+my1.mcmc<-bugs(data=list(n=length(svpdx$pdx),y=svpdx$pdx),
+               inits=list(list(phistar=0.975,mu=0,itau2=50)),
+               param=c("mu","phi","tau","theta"),
+               model="my1.txt",
+               n.iter = 11000, n.burnin = 1000, n.chains = 1)
+@               
+Here, the same initial parameter values as \cite{meyer2000bugs} are set. One chain of the MCMC simulation is run for 11000 iterations, with the first 1000 used for burn in. The resulting \texttt{bugs} object contains the MCMC simulation results for the parameters in the stochastic volatility model, including the time dependent volatility parameters ($\theta_t$). This set of sequential posterior distributions are of interest when studying the variation in the data over time. 
+
+The fanplot package can effectively display the entire posterior distribution of $\theta_t$. The separate MCMC simulation of the volatility be obtained from \texttt{my1.mcmcm} using\footnote{The fanplot package contains a shorter MCMC simulation (due to overall package size constraints) of $\theta_t$, which is overwritten when creating a new \texttt{th.mcmc} object},
+<<>>=
+th.mcmc <- my1.mcmc$sims.list$theta
+@
+A plot of the entire posterior distribution of $\theta_t$ first requires a calculation of the percentiles over all $t$ using the \texttt{pn} function,
+<<>>=
+th.pn <- pn(sims = th.mcmc)
+@
+This produces a \texttt{pn} type object, where rows represent the time index and columns the percentiles calculated.
+<<>>=
+head(th.pn[,c(1:3, 97:99)])
+@
+Every percentile between 1st and 99th are calculated by default, however, more or less percentiles can be calculated via the \texttt{p} argument in the \texttt{pn} function. The number of percentiles calculated has a direct impact on the plotting of the sequential distributions, as we shall see later. Additional arguments to control the indexing of the rows, which is of use when the time series are from regular intervals, will also be discussed later.
+
+In order to plot the \texttt{th.pn} percentile object the plot area must be first set. This can be done using \texttt{type = "n"} argument in \texttt{plot}. Both the \texttt{xlim} and \texttt{ylim} arguments need to be set appropriately. In the code below, the \texttt{xlim} argument is set between 1 and 945, the length of \texttt{th.pn}. The \texttt{ylim} argument is set to the range of \texttt{th.pn} to enable all percentiles calculated to be included in the plot area. 
+
+Once the plot area is set up, the \texttt{fan} function can be used to add the \texttt{th.pn} object. Each percentile in the plot is represented by a different shade of the default colour scale in the \texttt{fan.col} argument of fan. In addition, contour lines are drawn on every decile, with labels for these decides add to the right hand side.
+<<fig=TRUE, width=12, height=8>>=
+#empty plot
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
+#add fan
+fan(th.pn) 
+@
+
+The \texttt{fan.txt} function can be add more labels to a set of sequential distributions plotted using \texttt{fan}. When used in addition to the \texttt{fan} function, labels for closely spaced deciles can be controlled to allow a more spacious display of labels in comparison to those shown in the above plot. It can also be used to add text labels to percentiles that are not of a unit of 10, such as the 1st or 99th. The code below demonstrates these features. First a empty plot area is created with the x-axis changed to dates using the same method as in the plot of the original data. Second, the percentiles of the sequential distribution is plotted for $\theta_t$ with no text labels (setting \texttt{txt = NA}) and contour lines for the 1st and 99th percentiles alongside some selected deciles. The \texttt{ln} argument in the \texttt{fan} function is set to include contour lines at percentiles where future text labels are to be added.
+<<fig=TRUE, width=12, height=8>>=
+#empty plot with x-axis added later
+plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
+     ylim = range(th.pn), ylab = "Theta")
+axis(1, at = match(qtr, svpdx$rdate), labels = qtr, cex.axis = 0.75)
+axis(1, at = match(mth, svpdx$rdate), labels = FALSE, tcl = -0.2)
+#add fan
+fan(th.pn, txt = NA, ln = c(1,10,30,50,70,90,99))
+#add text labels for percentiles
+fan.txt(th.pn, pn.r = c(1,10,50,90,99))
+fan.txt(th.pn, pn.l = c(1,30,70,99))
+@
+
+The colour of the percentiles in the sequential distributions can be easily altered from the default \texttt{heat.colors} scheme. A new set of graded colours can be passed to the \texttt{fan} function using the \texttt{fan.col} argument. The number of colours should be half the number of percentiles (columns) in the \texttt{pn} object. New graded colour schemes can be constucted in a number of ways. For example, using the \texttt{colorRampPalette} a new shading from blue to white, via grey can be created.
+<<>>=
+pal <- colorRampPalette(c("royalblue", "grey", "white"))
+@
+Using this palette, 50 colours (approxiamtly half the number of percentiles calculated in \texttt{pn}) can be defined:
+<<>>=
+fancol <- pal(50)
+@
+For a change, this new colour scheme is used to plot the posterior distribution of the standard deviation over time, $\sigma_t$, which is derived as such:
+<<>>=
+sigma.pn <- pn(sims = sqrt(exp(th.mcmc)))
+@
+The new colour scheme can then be passed to the fan function for \texttt{sigma.pn}, with contour lines on selected percentiles:
+<<fig=TRUE, width=12, height=8>>=
+#empty plot with x-axis added later
+plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
+     ylim = range(sigma.pn), ylab = "Standard Deviation")
+axis(1, at = match(qtr, svpdx$rdate), labels = qtr, cex.axis = 0.75)
+axis(1, at = match(mth, svpdx$rdate), labels = FALSE, tcl = -0.2)
+#add fan
+fan(sigma.pn, fan.col = fancol, ln = c(1, 10, 50, 90, 99))
+@
+
+\section{Model Fits}
+To illustrate plots in the fanplot package that use time series objects (\texttt{ts}) based on regularly spaced data, a stochastic volatility model is fitted to the change of population growth rate of England and Wales, similar to that in \cite{abel2010cob}. 
+
+Population data from 1841 to 2010 from \cite{hmd2012} are included in the fanplot package (\texttt{ew}). The growth rate, that the stochastic volatility model is based on can be derived following \cite{rogers1995mrd} as such
+<<>>=
+r <- diff(log(ew))
+r <- ts(exp(r) - 1, 1841)
+@
+Using this growth rate time series, an MCMC sample of a stochastic volatility model parameters, forecasts and model fit to the change in the population growth rate can be obtained using the \texttt{ew.txt} file included in the model folder of the package:
+<<>>=
+library("R2OpenBUGS")
+# write model file:
+ew.bug<-dget(system.file("model/ew.txt", package = "fanplot"))
+write.model(ew.bug, "ew.txt")
+# take a look:
+file.show("ew.txt")
+# run openbugs
+ew.mcmc <- bugs(data = list(N = length(r), H = 25, r = c(r), p = c(ew)),
+                inits = list(list(a = exp(12), psi = 0.5, itau2 = 0.5)),
+                param = c("alpha", "psi", "tau", "r.new", "p.new", "y.sim"),
+                model = "ew.txt", 
+                n.iter = 11000, n.burnin = 1000, n.chains = 1)
+@
+As was the case with the exchange rate data, one chain of the MCMC simulation is run for 11000 iterations, with the first 1000 used for burn in. The resulting \texttt{bugs} object contains the MCMC simulation results for the parameters in the stochastic volatility model, including the time dependent model fits ($E(y_t)$), forecasts of the future population growth rate ($\hat{r}_{t+h|t}$) and population ($\hat{p}_{t+h|t}$). 
+
+The fanplot package can efficiently display these sequential distributions in a number of ways. Consider the MCMC simulation of the model fit, which can be extracted from the \texttt{ew.mcmc} using\footnote{The fanplot package contains a shorter MCMC simulation (due to overall package size constraints) of $E(y_t)$, which is overwritten when creating a new \texttt{y.mcmc} object},
+<<>>=
+y.mcmc <- ew.mcmc$sims.list$y.sim
+@
+A plot of the entire posterior distribution of the model fits requires the calculation of percentiles over all $t$ using the \texttt{pn} function. 
+<<>>=
+y.pn <- pn(sims = y.mcmc, start = 1842)
+@
+Here, the corresponding start date is also given so that the \texttt{pn} object takes the relevant time series properties when plotted. This saves on the previous effort for the non-regularly spaced exchange rate data, in setting up date labels on the x-axis. The time series properties are stored in the \texttt{tsp} attributes of the new \texttt{y.pn} object.
+<<>>=
+str(y.pn)
+@
+These attributes can be directly used to set up the x-axis limits in the plot area, alongside y-axis limits based on the difference in the growth rate, which was the basis for the stochastic variance model. The \texttt{fan} function can then be used to add the sequential posterior distributions with contour lines at the 1st, 10th, 90th and 99th percentiles using the \texttt{ln} argument. Note, the \texttt{fan} function will automatically only draw and label contour lines given in the \texttt{ln} argument. If the user wishes to subdue this and add text labels later, they can do so by adding the \texttt{txt = NA} as was demonstrated earlier. The original data can also be plotted on top of the posterior distributions using the \texttt{lines} function:
+<<fig=TRUE, width=12, height=8>>=
+#empty plot
+plot(NULL, type = "l", xlim = range(time(y.pn)), xlab = "Time",
+     ylim = range(diff(r)), ylab = "Expected Model Fit")
+#add fan
+fan(y.pn, ln = c(1, 10, 90, 99))
+#add data
+lines(diff(r), lwd = 2)
+@
+
+A coarser set of colours can be plotted by creating a \texttt{pn} object with fewer percentiles. This is done by defining the \texttt{p} argument of the \texttt{pn} function with the only the percentiles for which colour changes are desired. 
+<<>>=
+y.pn2 <- pn(sims = y.mcmc, p = c(1, 20, 40, 60, 80, 99), start = 1842)
+@
+Note, that elements of \texttt{p} will ultimately be adjusted to be symmetric around 50. For example if a user set \texttt{p = c(1, 40, 80)} a \texttt{pn} object identical the one above would be returned. This allows the user, if desired, to only define percentiles either above or below 50.
+
+The new \texttt{y.pn2} object can be plotted using the default arguments for contour lines and text labels. Lines are never drawn for percentiles not calculated in the \texttt{pn} object. As a result, in the plotting of \texttt{y.pn2} there are no contour lines on the 10th, 30th, 50th, 70th and 90th deciles. 
+<<fig=TRUE, width=12, height=8>>=
+#empty plot
+plot(NULL, type = "l", xlim = range(time(y.pn)), xlab = "Time",
+     ylim = range(diff(r)), ylab = "Expected Model Fit")
+#add fan
+fan(y.pn2) 
+#add data
+lines(diff(r), lwd = 2)
+@
+
+\section{Forecast Fans}
+To illustrate the plotting of forecast fans we use the MCMC predictive distributions in the \texttt{ew.mcmc} object. These are estimated for the population growth rate and population total, and can be extracted as such\footnote{The fanplot package contains a shorter MCMC simulations (due to overall package size constraints) of $\hat{r}_{t+h|t}$ and $\hat{p}_{t+h|t}$ which are overwritten when creating new \texttt{rnew.mcmc} and \texttt{pnew.mcmc} objects},
+<<>>=
+rnew.mcmc <- ew.mcmc$sims.list$r.new
+pnew.mcmc <- ew.mcmc$sims.list$p.new
+@
+Percentiles for \texttt{rnew.mcmc} can be derived as 
+<<>>=
+rnew.pn <- pn(sims = rnew.mcmc, start = end(r)[1] + 1)
+@
+Note, that as \texttt{rnew.mcmc} is a simulation of forecasts, the \texttt{start} argument set to the year after the last observation of the population growth rate. Forecast fans are plotted after estimating the percentile objects, much in the same way as they were for the volatility and model fit in the previous sections. However, some extra care must be taken in setting up the \texttt{xlim} to allow space for the fan to appear in the right hand side of plotting area. For the population growth rate this is demonstrated alongside a small section of the underlying simulation data (the first 30 MCMC samples of predictive distribution) that are represent a small part of the underlying data used to calculate the percentiles.
+<<fig=TRUE, width=12, height=8>>=
+par(mfrow = c(1 ,2))
+#sample of underlying simulation data
+plot(r, ylim = range(r), xlim = c(1940, 2040), 
+     ylab = "Population Growth Rate", lwd = 2)
+for (i in 1:30) lines(ts(rnew.mcmc[i, ], end(r)[1] + 1), col = "grey")
+#plot r
+plot(r, ylim = range(r), xlim = c(1940, 2040), 
+     ylab = "Population Growth Rate", lwd = 2)
+#add fan
+fan(rnew.pn) 
+@
+
+The anchor argument in \texttt{pn} can be utilised to bridge the gap between the predictive distribution fan and the final data point. The associated starting point for creating an time series type object for plotting must also be adjusted to account for the anchoring. For the \texttt{pnew.mcmc} the two alternative sets of percentile calculations, with or without an anchoring can be derived as such:
+<<>>=
+h0 <- end(ew)[1]
+pnew.pn <- pn(sims = pnew.mcmc/1e+06, start = h0 + 1)
+pnew.pn2 <- pn(sims = pnew.mcmc/1e+06, p = c(1, 10, 40, 50), 
+    anchor = ew[length(ew)]/1e+06, start = h0)
+@
+For the \texttt{pnew.pn2} only a few percentiles are calculated, which will provide a coarser set of shade in the plotting of the predictive distribution. In addition, the anchor is set to the last observed population count and the start point is now on the last obseravtion \texttt{h0}, not at \texttt{h0 + 1}. In both calculations simulations are divided by one million to provide easier interpretation.
+
+Both \texttt{pn} objects can be plotted side by side using the \texttt{fan} function. Contour line colours can be altered directly using the \texttt{ln.col} argument for the display of \texttt{pnew.pn2} on the right hand side below, in comparison to the default plot on the left hand side.
+<<fig=TRUE, width=12, height=8>>=
+par(mfrow = c(1 ,2))
+#plot pop
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
+     ylab = "Population (m)", lwd = 2)
+#add fan
+fan(pnew.pn)
+#plot pop
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
+     ylab = "Population (m)", lwd = 2)
+#add fan
+fan(pnew.pn2, ln.col = "black") 
+@
+
+\bibliographystyle{chicago}
+\bibliography{fanplot}
+
+\end{document}
