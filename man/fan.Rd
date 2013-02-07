@@ -97,16 +97,43 @@ plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
 # add fan
 fan(sigma.pn, fan.col = fancol, ln = c(1, 10, 50, 90, 99))
 
+\dontrun{
 ##
 ##Forecast fans 1) default 2) coarser colours, different contour line colour and anchoring fan
 ##
+# create BUGS model
+library("tsbugs")
+r <- diff(log(ew)) 
+y <- diff(r) 
+pop.bug <- sv.bugs(y, h=25, sim=TRUE,
+                  sv.mean.prior2 = "dgamma(0.000001,0.000001)", 
+                  sv.ar.prior2 = "dunif(-0.999, 0.999)")
+
+# run in OpenBUGS
+library("R2OpenBUGS")
+writeLines(pop.bug$bug, "pop.txt")
+pop <- bugs(data = pop.bug$data,
+            inits = list(list(psi0.star=exp(12), psi1=0.5, itau2=0.5)),
+            param = c("psi0", "psi1", "tau", "y.new", "y.sim"),
+            model = "pop.txt", 
+            n.iter = 11000, n.burnin = 1000, n.chains = 1)
+
+# derive posterior predictive distributions of the population growth rate and population total
+ynew.mcmc <- pop$sims.list$y.new
+rnew.mcmc <- apply(ynew.mcmc, 1, diffinv, xi = tail(r,1))
+rnew.mcmc <- t(rnew.mcmc[-1,])
+
+pnew.mcmc <- apply(rnew.mcmc, 1, diffinv, xi = log(tail(ew,1)))
+pnew.mcmc <- t(pnew.mcmc[-1,])
+pnew.mcmc <- exp(pnew.mcmc)
+
 # calculate percentiles across time
 h0 <- end(ew)[1]
 pnew.pn <- pn(sims = pnew.mcmc/1e+06, start = h0 + 1)
 pnew.pn2 <- pn(sims = pnew.mcmc/1e+06, p = c(1, 10, 40, 50), 
                anchor = tail(ew/1e+06, 1), start = h0) 
 
-# plot pop
+# plot ew
 par(mfrow = c(1 ,2))
 plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
      ylab = "Population (m)", lwd = 2)
@@ -114,11 +141,12 @@ plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040),
 # add fan    
 fan(pnew.pn)
 
-# plot pop
+# plot ew
 plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
      ylab = "Population (m)", lwd = 2)
      
 # add fan
 fan(pnew.pn2, ln.col = "black")
+}
 }
 \keyword{ aplot }

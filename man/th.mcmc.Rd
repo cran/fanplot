@@ -5,16 +5,16 @@
 1000 MCMC Simulations of Estimated Volatility from Pound Dollar Exchange Rate Data.
 }
 \description{
-MCMC simulations of volatility obtained from the \code{bugs} function in the R2OpenBUGS package. Estimates based on the first stochastic volatility model for Pound-Dollar exchange rate data presented in Meyer and Yu (2000). The MCMC was ran for 1100 simulations, thining to keep every 10th iteration, and treating the first 100 simulations as burn in.
+MCMC simulations of volatility obtained from the \code{bugs} function in the R2OpenBUGS package. Estimates based on the stochastic volatility model for Pound-Dollar exchange rate data presented in the appendix of Meyer and Yu (2002). The MCMC was ran for 1100 simulations, thining to keep every 10th iteration, and treating the first 100 simulations as burn in.
 
-Larger simulations (without thinning) can be obtained using the data (\code{\link{svpdx}}) and the my1.txt BUGS file contained in this package, see example below.
+Larger simulations (without thinning) can be obtained using the data (\code{svpdx}) and the my1.txt BUGS file contained in this package, see example below.
 }
 \usage{data(th.mcmc)}
 \details{
 See Meyer and Yu (2010) for model specification.
 }
 \references{
-Meyer, R. and J. Yu (2000). BUGS for a Bayesian analysis of stochastic volatility models. \emph{Econometrics Journal} 3 (2), 198--215.
+Meyer, R. and J. Yu (2002). BUGS for a Bayesian analysis of stochastic volatility models. \emph{Econometrics Journal} 3 (2), 198--215.
 
 Sturtz, S., U. Ligges, and A. Gelman (2005). R2WinBUGS: a package for running WinBUGS from R. \emph{Journal of Statistical Software} 12 (3), 1--16.
 }

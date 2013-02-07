@@ -1,11 +1,10 @@
 Package: fanplot
 Type: Package
 Title: Visualisations of sequential probability distributions.
-Version: 1.1
-Date: 2012-06-25
+Version: 1.2
 Author: Guy J. Abel
-Maintainer: Guy J. Abel <g.j.abel@gmail.com>
-Depends: R (>= 2.10)
+Maintainer: "Guy J. Abel" <g.j.abel@gmail.com>
+Depends: R(>= 2.15.0), tsbugs
 Description: The fanplot package contains a collection of R functions
         to effectively display plots of sequential distributions such
         as probabilistic forecasts. The plotting of distributions are
@@ -19,6 +18,6 @@ Suggests: R2OpenBUGS
 License: GPL-2
 LazyLoad: yes
 LazyData: yes
-Packaged: 2012-08-02 15:27:22 UTC; gabel
+Packaged: 2013-02-07 16:37:13 UTC; gabel
 Repository: CRAN
-Date/Publication: 2012-08-02 19:28:47
+Date/Publication: 2013-02-07 18:34:01
