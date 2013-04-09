@@ -7,7 +7,7 @@ Text Labels for Specified Percentiles
 Adds text labels beside relevant percentiles.
 }
 \usage{
-fan.txt(psims, pn.r = NULL, pn.l = NULL, pos = NULL, offset = NULL, ...)
+fan.txt(psims, pn.r = NULL, pn.l = NULL, pos = NULL, offset = NULL, cex=0.8, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -25,6 +25,9 @@ Position specifier for the text. Passed directly to \code{pos} argument in \code
 }
   \item{offset}{
 Offset for \code{pos}. Passed directly to \code{offset} argument in \code{text}.
+}
+  \item{cex}{
+Text size of labels. Passed directly to \code{text}.
 }
   \item{\dots}{
 Additional arguments passed to \code{text} to control label characteristics.

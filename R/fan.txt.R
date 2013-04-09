@@ -1,5 +1,5 @@
 fan.txt <-
-function(psims, pn.r=NULL, pn.l=NULL, pos=NULL, offset=NULL,...){
+function(psims, pn.r=NULL, pn.l=NULL, pos=NULL, offset=NULL, cex=0.8, ...){
 	if(class(psims)!="pn")
 		stop("psims must be a pn object (use fan.pn)")
 	p<-colnames(psims)
@@ -14,6 +14,6 @@ function(psims, pn.r=NULL, pn.l=NULL, pos=NULL, offset=NULL,...){
 	if(is.null(pos) & !is.null(pn.r))	pos<-4
 	if(is.null(pos) & !is.null(pn.l))	pos<-2
 	if(is.null(offset))	offset<-0.1
-	if(!is.null(pn.r))	text(end(psims)[1], psims[dim(psims)[1],match(pn.r,p)], paste(pn.r, "%", sep = ""), pos=pos, offset=offset, ...)
-	if(!is.null(pn.l))	text(start(psims)[1], psims[1,match(pn.l,p)], paste(pn.l, "%", sep = ""), pos=pos, offset=offset, ...)
+	if(!is.null(pn.r))	text(end(psims)[1], psims[dim(psims)[1],match(pn.r,p)], paste0(pn.r, "%"), pos=pos, offset=offset, cex=cex, ...)
+	if(!is.null(pn.l))	text(start(psims)[1], psims[1,match(pn.l,p)], paste0(pn.l, "%"), pos=pos, offset=offset, cex=cex, ...)
 }

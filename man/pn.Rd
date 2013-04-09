@@ -68,7 +68,7 @@ fan(th.pn2)
 library("tsbugs")
 r <- diff(log(ew)) 
 y <- diff(r) 
-pop.bug <- sv.bugs(y, h=25, sim=TRUE,
+pop.bug <- sv.bugs(y, k=25, sim=TRUE,
                   sv.mean.prior2 = "dgamma(0.000001,0.000001)", 
                   sv.ar.prior2 = "dunif(-0.999, 0.999)")
 
@@ -86,27 +86,23 @@ ynew.mcmc <- pop$sims.list$y.new
 rnew.mcmc <- apply(ynew.mcmc, 1, diffinv, xi = tail(r,1))
 rnew.mcmc <- t(rnew.mcmc[-1,])
 
-pnew.mcmc <- apply(rnew.mcmc, 1, diffinv, xi = log(tail(ew,1)))
-pnew.mcmc <- t(pnew.mcmc[-1,])
-pnew.mcmc <- exp(pnew.mcmc)
+pnew.mcmc <- apply(1+rnew.mcmc, 1, cumprod) * tail(ew,1)
+pnew.mcmc <- t(pnew.mcmc)
 
 # calculate percentiles across time
-h0 <- end(ew)[1]
-pnew.pn <- pn(sims = pnew.mcmc/1e+06, start = h0 + 1)
-pnew.pn2 <- pn(sims = pnew.mcmc/1e+06, p = c(1, 10, 40, 50), 
-               anchor = tail(ew/1e+06, 1), start = h0) 
+r0 <- tsp(r)[2]
+rnew.pn <- pn(sims = rnew.mcmc, start = r0 + 1)
+pnew.pn <- pn(sims = pnew.mcmc/1e+06, start = r0 + 1, anchor = tail(ew/1e+06, 1),) 
 
 # plot ew
 par(mfrow = c(1 ,2))
-plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
-     ylab = "Population (m)", lwd = 2)
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Population (m)", lwd = 2)
      
 # add fan    
 fan(pnew.pn)
 
 # plot ew
-plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), 
-     ylab = "Population (m)", lwd = 2)
+plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Population (m)", lwd = 2)
      
 # add fan
 fan(pnew.pn2, ln.col = "black")
