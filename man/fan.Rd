@@ -62,7 +62,7 @@ fan(th.pn)
 # empty plot
 plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
 # add fan
-fan(th.pn)
+fan(th.pn, text=NA)
 
 
 ##

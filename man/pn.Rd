@@ -14,7 +14,7 @@ pn(sims, p = 1:50, anchor = NULL, ...)
 Set of sequential simulation data, where rows represent simulation number and columns represent some form of index.
 }
   \item{p}{
-Percentiles to be calculated, and later plotted using the \code{fan} function. These must be between 0 and 100 (inclusive). Percentiles greater than 50, if not given, are automatically calculated as 100-\code{pn}, to ensure symmetric fan. Values can be non-integers.
+Percentiles to be calculated, and later plotted using the \code{fan} function. These must be between 0 and 100 (inclusive). Percentiles greater than 50, if not given, are automatically calculated as 100-\code{p}, to ensure symmetric fan. Values can be non-integers.
 }
   \item{anchor}{
 Optional data value to anchor a forecast fan on. Typically this will be the last observation of the observed data series.
