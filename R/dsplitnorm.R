@@ -18,7 +18,7 @@ function(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
   n <- max(length(x),length(mean),length(sd),length(skew),length(sd1),length(sd2))
   f <- rep(NA, n)
   c <- sqrt(2/pi)/(sd1 + sd2)
-  f[x < mean] <- c * exp((-(x[x < mean] - mean)^2)/(2 * var1))
-  f[x >= mean] <- c * exp((-(x[x >= mean] - mean)^2)/(2 * var2))
+  f[x <= mean] <- c * exp((-(x[x <= mean] - mean)^2)/(2 * var1))
+  f[x >  mean] <- c * exp((-(x[x >  mean] - mean)^2)/(2 * var2))
   return(f)
 }

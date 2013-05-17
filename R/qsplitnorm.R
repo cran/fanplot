@@ -17,11 +17,13 @@ function(p, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
     stop("skew must be between -1 and 1")
   n <- max(length(p),length(mean),length(sd),length(skew),length(sd1),length(sd2))
   f <- rep(NA, n)
-  p.star <- f #to deal with long sd
-  p.star[] <- p
-  psn <- psplitnorm(p.star, mean = mean, sd1 = sd1, sd2 = sd2)
+  alpha <- f #to deal with long sd
+  alpha[] <- p
+  mu <- f
+  mu[] <- mean
+  p <- psplitnorm(mu, mean = mean, sd1 = sd1, sd2 = sd2)
   c <- sqrt(2/pi)/(sd1 + sd2)
-  f[p < psn] <- (mean + sd1 * qnorm(p/(c * sqrt(2 * pi) * sd1)) )[p < psn]
-  f[p >= psn] <- (mean + sd2 * qnorm((p + c * sqrt(2 * pi) * sd2 - 1)/(c * sqrt(2 * pi) * sd2)))[p >= psn]
+  f[alpha <= p] <- (mean + sd1 * qnorm( alpha[alpha <= p]/(c * sqrt(2 * pi) * sd1)))
+  f[alpha >  p] <- (mean + sd2 * qnorm((alpha[alpha >  p] + c * sqrt(2 * pi) * sd2 - 1)/(c * sqrt(2 * pi) * sd2)))
   f
 }

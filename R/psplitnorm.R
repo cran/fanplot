@@ -18,9 +18,9 @@ function(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
   n <- max(length(x),length(mean),length(sd),length(skew),length(sd1),length(sd2))
   f <- rep(NA, n)
   c <- sqrt(2/pi)/(sd1 + sd2)
-  x.star <- f #to deal with long sd
-  x.star[] <- x
-  f[x.star < mean] <- (c * sqrt(2 * pi) * sd1 * pnorm((x.star - mean)/sd1))[x.star < mean]
-  f[x.star >= mean] <- (1 - c * sqrt(2 * pi) * sd2 * (1 - pnorm((x.star - mean)/sd2)))[x.star >= mean]
+  k <- f 
+  k[] <- x
+  f[k <= mean] <- (c * sqrt(2 * pi) * sd1 * pnorm((k - mean)/sd1))[k <= mean]
+  f[k >  mean] <- (1 - c * sqrt(2 * pi) * sd2 * (1 - pnorm((k - mean)/sd2)))[k > mean]
   return(f)
 }
