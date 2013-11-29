@@ -1,5 +1,18 @@
 dsplitnorm <-
 function(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
+  n <- max(length(x),length(mean),length(sd),length(skew),length(sd1),length(sd2))
+  if(length(x)<n)
+    x[1:n]<-x
+  if(length(mean)<n)
+    mean[1:n]<-mean
+  if(length(sd)<n)
+    sd[1:n]<-sd
+  if(length(skew)<n)
+    skew[1:n]<-skew
+  if(length(sd1)<n)
+    sd1[1:n]<-sd1
+  if(length(sd2)<n)
+    sd2[1:n]<-sd2
   var0 <- sd^2
   if (!is.null(sd1)) 
     var1 <- sd1^2
@@ -13,12 +26,13 @@ function(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
     sd1 <- sqrt(var1)
     sd2 <- sqrt(var2)
   }
-  if (skew > 1 & skew < 1) 
+  if (any(findInterval(skew, c(-1,1), rightmost.closed=TRUE)!=1) )
     stop("skew must be between -1 and 1")
-  n <- max(length(x),length(mean),length(sd),length(skew),length(sd1),length(sd2))
   f <- rep(NA, n)
   c <- sqrt(2/pi)/(sd1 + sd2)
-  f[x <= mean] <- c * exp((-(x[x <= mean] - mean)^2)/(2 * var1))
-  f[x >  mean] <- c * exp((-(x[x >  mean] - mean)^2)/(2 * var2))
+  x1 <- x <= mean
+  x2 <- x > mean
+  f[x1] <- c[x1] * exp((-(x[x1] - mean[x1])^2)/(2 * var1[x1]))
+  f[x2] <- c[x2] * exp((-(x[x2] - mean[x2])^2)/(2 * var2[x2]))
   return(f)
 }

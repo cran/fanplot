@@ -9,9 +9,18 @@ The fanplot package contains a collection of R functions to effectively display 
 }
 \details{
  The plotting of distributions are based around two functions. The first, pn, calculates the percentiles for a set of sequential distributions over a specified time period. The second, fan, plots the calculated percentiles of the sequential distributions. The resulting plot is a set of coloured polygon, with shadings corresponding to the percentile values.
+\tabular{ll}{
+Package: \tab tsbugs\cr
+Type: \tab Package\cr
+License: \tab GPL-2\cr
+}
 }
 \author{
 Guy J. Abel
+}
+\references{
+Blog posts with many additional details of the implementation of functions in the package can be found at:
+\url{http://gjabel.wordpress.com/category/r/fanplot/} 
 }
 \examples{
 # calculate percentiles across time

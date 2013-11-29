@@ -7,7 +7,7 @@ Calculate Percentiles of Sequential Simulation Data
 Creates a \code{pn} object, the essential input object into the \code{\link{fan}} function, to plot sequential distrbution data.
 }
 \usage{
-pn(sims, p = 1:50, anchor = NULL, ...)
+pn(sims, p = 1:50, p.int=NULL, anchor=NULL, type="percentile", ...)
 }
 \arguments{
   \item{sims}{
@@ -16,15 +16,21 @@ Set of sequential simulation data, where rows represent simulation number and co
   \item{p}{
 Percentiles to be calculated, and later plotted using the \code{fan} function. These must be between 0 and 100 (inclusive). Percentiles greater than 50, if not given, are automatically calculated as 100-\code{p}, to ensure symmetric fan. Values can be non-integers.
 }
+  \item{p.int}{
+Prediction intervals to be calculated, when \code{type="interval"} and later plotted using the \code{fan} function. These must be between 0 and 100 (inclusive). Values can be non-integers. By default is \code{NULL}. When \code{type="interval"} is set, default prediction intervals of \code{p.int=c(50,80,95)} are taken.
+}
   \item{anchor}{
 Optional data value to anchor a forecast fan on. Typically this will be the last observation of the observed data series.
+}
+  \item{type}{
+Calculate percentiles or prediction intervals. Can take either \code{"percentile"} or \code{"interval"}.
 }
   \item{\dots}{
 Other arguments passed to add \code{ts} type attiributes. Typically one should give a value for \code{start}.
 }
 }
 \details{
-Returns a \code{pn} object, the basis of the \code{\link{fan}} function. The argument \code{p} indicates which parameters should be calculated and later plotted. Hence, it must take only values between 1 and 100. Values must also be symmetric around 50. 
+Returns a \code{pn} object, the basis of the \code{\link{fan}} function. The argument \code{p} indicates which parameters should be calculated and later plotted. Hence, it must take only values between 1 and 100. Values must also be symmetric around 50. Symmetry is forced, if not provided in \code{p}. When \code{p.int} is given, values to \code{p} are ignored.
 
 The \code{anchor} argument can be used if the simulation data need to be plotted to join up to a single point to create a funnel shape plot. The value of the anchor point should be given in argument. 
 
@@ -59,6 +65,16 @@ plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
 
 # add coarser fan
 fan(th.pn2) 
+
+##
+##Prediction intervals
+##
+th.pn <- pn(sims = th.mcmc, p.int=seq(10,90,10), type="intervals")
+head(th.pn)
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
+fan(th.pn, ln=c(50,80,90))
+fan.txt(th.pn, pn.l = c(10,30,70), hl.lab=c("L","U"))
+
 
 \dontrun{
 ##

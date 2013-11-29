@@ -8,7 +8,7 @@ Plots percentiles of sequential distributions provided by \code{\link{pn}} objec
 }
 \usage{
 fan(psims, fan.col = heat.colors(floor(dim(psims)[2]/2)), 
-      ln.col = fan.col[1], ln = NULL, txt = NULL, ...)
+      ln.col = fan.col[1], ln = seq(10,90,10), txt = ln, hl.lab=NULL, style="fan", ...)
 }
 \arguments{
   \item{psims}{
@@ -21,17 +21,23 @@ Palette of colours used in the fan plot
 Line colour to be imposed on top of the fan
 }
   \item{ln}{
-Vector of number to plot contour lines on top the fan. Must correspond to calculated percentiles in  \code{psims}
+Vector of number to plot contour lines on top the fan. Must correspond to calculated percentiles in \code{psims}. By default takes every decile contained within the \code{\link{pn}} object. If the \code{\link{pn}} object contains intervals rather than percentiles then defaults to plot lines on the upper and lower 50th, 80th and 95th prediction intervals (if calculated in the \code{\link{pn}} object).
 }
   \item{txt}{
 Vector of number to plot text at the end of corresponding percentiles. Must be in calculated percentiles of \code{psims}.
+}
+  \item{hl.lab}{
+Sting of length 2, with low/lowest/bottom labels first and high/highest/top labels second.
+}
+  \item{style}{
+Style of fan. Can only take \code{"fan"} at the moment.
 }
   \item{\dots}{
 Additional arguments passed to \code{lines}.
 }
 }
 \details{
-Returns a plot of the percentiles given in the \code{psims} argument. Additional lines and text are added to illustrate major contours on the probability distribution. By default these run on every decile. Text is automatically added where lines are drawn. Hence, if text is only required where there are contour lines, there is no need to specify anything in the \code{txt} argument. Text can also be suppressed and added later using \code{\link{fan.txt}}. Lines can be suppressed by adding \code{type = "n"} as an additional argument to be passed to line characteristics. Colours are by default taken from the \code{heat.colors} palette. Alternatives can be specified using \code{fan.col}. The joining of a forecast fan to data is controlled be the anchor argument in the \code{\link{pn}} function.
+Returns a plot of the percentiles given in the \code{psims} argument. Additional lines and text are added to illustrate major contours on the probability distribution. By default these run on every decile. Text is automatically added where lines are drawn. Hence, if text is only required where there are contour lines, there is no need to specify anything in the \code{txt} argument. Text can also be suppressed and added later using \code{\link{fan.txt}}. Lines can be suppressed by adding \code{type = NULL}. Colours are by default taken from the \code{heat.colors} palette. Alternatives can be specified using \code{fan.col}. The joining of a forecast fan to data is controlled be the anchor argument in the \code{\link{pn}} function.
 }
 \value{
 See Details
@@ -62,7 +68,7 @@ fan(th.pn)
 # empty plot
 plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
 # add fan
-fan(th.pn, text=NA)
+fan(th.pn, text=NULL)
 
 
 ##
@@ -73,7 +79,7 @@ plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
      ylim = range(th.pn), ylab = "Theta")
 
 # add fan
-fan(th.pn, txt = NA, ln = c(1,10,30,50,70,90,99))
+fan(th.pn, txt = NULL, ln = c(1,10,30,50,70,90,99))
 
 # add text labels for percentiles
 fan.txt(th.pn, pn.r = c(1,10,50,90,99))
@@ -96,6 +102,15 @@ plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
      
 # add fan
 fan(sigma.pn, fan.col = fancol, ln = c(1, 10, 50, 90, 99))
+
+
+##
+##Prediction Intervals
+##
+th.pn <- pn(sims = th.mcmc, type="intervals")
+head(th.pn)
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
+fan(th.pn, ln=c(50,90), hl.lab=c("L","U"))
 
 \dontrun{
 ##
