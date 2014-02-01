@@ -4,7 +4,9 @@
 Plot a Fan Filled with a Single Colour
 }
 \description{
-Plots a single fan representing a percentile range from a set of sequential distributions. Predominantly intended for use within the \code{\link{fan}} function.
+This function is no longer recommended. Was intended for use with original \code{fan} function (which now goes by \code{\link{fan0}}).
+
+Plots a single fan representing a percentile range from a set of sequential distributions. Predominantly intended for use within the \code{\link{fan0}} function.
 }
 \usage{
 fan.fill(ts1, ts2, fan.col = "grey", ...)
@@ -24,7 +26,7 @@ fan.fill(ts1, ts2, fan.col = "grey", ...)
 }
 }
 \details{
-Returns a plot of a single polygon between the selected percentiles. Colours can also be specified in the \code{fan.col} argument. Additional arguments are passe to \code{polygon}.
+Returns a plot of a single polygon between the selected percentiles. Colours can also be specified in the \code{fan.col} argument. Additional arguments are passed to \code{polygon}.
 }
 \value{
 See Details.
@@ -34,14 +36,14 @@ Guy J. Abel
 }
 
 \seealso{
-\code{\link{fan}}, \code{\link{pn}}, \code{\link{fan.txt}}
+\code{\link{fan}} \code{\link{fan0}}, \code{\link{pn}}, \code{\link{fan.txt}}
 }
 \examples{
 # calculate percentiles across time
 th.pn <- pn(sims = th.mcmc)
 
 # set up plot area
-plot(svpdx$pdx, type = "n", xlim = c(0, 945), ylim = range(th.pn), ylab = "Theta")
+plot(NULL, type = "n", xlim = c(0, 945), ylim = range(th.pn), ylab = "Theta")
 
 # plot different colours and patterns of shading
 fan.fill(th.pn[, "10\%"], th.pn[, "90\%"])

@@ -20,11 +20,16 @@ Sturtz, S., U. Ligges, and A. Gelman (2005). R2WinBUGS: a package for running Wi
 }
 \examples{
 \dontrun{
-plot(th.mcmc)
+# empty plot
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+
+# add fan
+fan(th.mcmc)
 
 ##
 ##Create your own (longer) MCMC sample:
 ##
+library("tsbugs")
 library("R2OpenBUGS")
 # write model file:
 my1.bug <- dget(system.file("model", "my1.txt", package = "fanplot"))

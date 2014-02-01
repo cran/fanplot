@@ -4,160 +4,225 @@
 Fan Plot of Distributions Percentiles Over Time.
 }
 \description{
-Plots percentiles of sequential distributions provided by \code{\link{pn}} object. Typically called after the plot area has been set.
+Visualise sequential distributions using a range of plotting styles.
 }
 \usage{
-fan(psims, fan.col = heat.colors(floor(dim(psims)[2]/2)), 
-      ln.col = fan.col[1], ln = seq(10,90,10), txt = ln, hl.lab=NULL, style="fan", ...)
+fan(data = NULL, data.type = "simulations", style = "fan", type = "percentile", 
+ probs = if (type == "percentile") seq(0.01, 0.99, 0.01) else c(0.5, 0.8, 0.95), 
+ start = 1, frequency = 1, anchor = NULL, 
+ fan.col = heat.colors, alpha = if (style == "spaghetti") 0.2 else 1, 
+ n.fan = NULL, 
+ ln = if(length(probs)<10) probs else probs[round(probs,5)==round(seq(0.1, 0.9, 0.1),5)],
+ med.ln = if(type=="interval") TRUE else FALSE,
+ ln.col = NULL, med.col= NULL,
+ rlab = ln, rpos = 4, roffset = 0.1, rcex = 0.8, rcol = NULL, 
+ llab = FALSE, lpos = 2, loffset = roffset, lcex = rcex, lcol = rcol, 
+ upplab = "U", lowlab = "L", medlab="M",
+ n.spag = 30, 
+ space = if (style == "boxplot") 1/frequency else 0.9/frequency, ...)
 }
 \arguments{
-  \item{psims}{
-\code{pn} object created by the \code{\link{pn}} function.
+  \item{data}{
+Set of sequential simulation data, where rows represent simulation number and columns represent some form of time index. 
+If \code{data.type = "values"}, switches to data, where rows represent values for a set of probabilities (which need to be provided in \code{probs} and columns represent some form of time index.
+
+When the object is of (old style) type \code{pn.ts} all relevant arguments are sent to \code{fan0}.
 }
-  \item{fan.col}{
-Palette of colours used in the fan plot
-}
-  \item{ln.col}{
-Line colour to be imposed on top of the fan
-}
-  \item{ln}{
-Vector of number to plot contour lines on top the fan. Must correspond to calculated percentiles in \code{psims}. By default takes every decile contained within the \code{\link{pn}} object. If the \code{\link{pn}} object contains intervals rather than percentiles then defaults to plot lines on the upper and lower 50th, 80th and 95th prediction intervals (if calculated in the \code{\link{pn}} object).
-}
-  \item{txt}{
-Vector of number to plot text at the end of corresponding percentiles. Must be in calculated percentiles of \code{psims}.
-}
-  \item{hl.lab}{
-Sting of length 2, with low/lowest/bottom labels first and high/highest/top labels second.
+  \item{data.type}{
+Indicates if \code{data} are sets of pre-calculated values based for defined probabilities \code{data.type = "values"} or simulated data \code{data.type = "simulations"}. That later is the default.
 }
   \item{style}{
-Style of fan. Can only take \code{"fan"} at the moment.
+Plot style, choose from \code{fan} (default), \code{spaghetti} \code{boxplot} or \code{boxfan}. See Examples and Details Sections for further explanation.
+}
+  \item{type}{
+Type of percentiles to plot in \code{fan} or \code{boxfan}. Choose from, \code{percentile} (default) or \code{interval}.
+}
+  \item{probs}{
+Probabilities related to percentiles or prediction intervals to be plotted (dependent on the \code{type} function. These values control the number of shades used in the \code{fan} or \code{boxfan}. These must be between 0 and 100 (inclusive) or 0 and 1. Percentiles greater than 50 (or 0.5), if not given, are automatically calculated as 100-\code{p}, to ensure symmetric fan. Values can be non-integers. Default to single percentile values when \code{type="percetinle"} and the 50th, 80th and 95th prediction interval when \code{type="interval"} is set.
+}
+  \item{start}{
+The time of the first distribution in \code{sims}. Similar to use in \code{\link{ts}}.
+}
+  \item{frequency}{
+The number of distribution in \code{sims} per unit of time in \code{sims}. Similar to use in \code{\link{ts}}.
+}
+  \item{anchor}{
+Optional data value to anchor a forecast fan on. Typically this will be the last observation of the observed data series.
+}
+  \item{fan.col}{
+Palette of colours used in the \code{fan} or \code{boxfan}.
+}
+  \item{n.fan}{
+The number of colours to use in the fan.
+}
+  \item{alpha}{
+Factor modifying the opacity alpha; typically in [0,1].
+}
+  \item{ln}{
+Vector of number to plot contour lines on-top \code{fan} or \code{boxfan}. Must correspond to calculated percentiles in \code{probs}. By default takes either every percentile or prediction interval given in the \code{probs} argument (if less then 10) or, when there are more than 10 \code{probs} passed, the either every decile or every prediction interval that are a multiple of 10 and given in \code{probs}.
+}
+  \item{med.ln}{
+Add a median line to fan. Might be of particular use if \code{type="interval"}. Only works when \code{data.type = "simulations"} and one of \code{fan}, \code{boxfan} or \code{spaghetti} styles.
+}
+  \item{ln.col}{
+Line colour to be imposed on top of the fan. By default takes the darkest colour from \code{fan.col} argument.
+}
+  \item{med.col}{
+Median Line colour. By default this is set to the first colour in \code{fan.col}. Users might wish to change to highlight the median.
+}
+  \item{rlab}{
+Vector of labels at the end (right) of corresponding percentiles or prediction intervals of the \code{fan} or \code{boxfan}. Must be in calculated in the \code{probs} argument. By default plotted alongside values provided to the \code{ln} argument.
+}
+  \item{rpos}{
+Position of right labels for the \code{fan} or \code{boxfan}. See \code{\link{text}}.
+}
+  \item{roffset}{
+Offset of right labels for the \code{fan} or \code{boxfan}. See \code{\link{text}}.
+}
+  \item{rcex}{
+Text size of right labels for the \code{fan} or \code{boxfan}. See \code{\link{text}}.
+}
+  \item{rcol}{
+Colour of text for right labels for the \code{fan} or \code{boxfan}. See \code{\link{text}}.
+}
+  \item{llab}{
+Can take either 1) a \code{TRUE} or \code{FALSE} value to plot label at the start (right) of the  corresponding percentiles or prediction intervals given in \code{rlab}, default is \code{FALSE} or 2) a original vector of percentiles or prediction intervals. Must be in calculated in the \code{probs} argument. Only works for \code{fan} or \code{boxfan} styles.
+}
+  \item{lpos}{
+Position of left labels for the \code{fan} or \code{boxfan}. See \code{\link{text}}.
+}
+  \item{loffset}{
+Offset of left labels for the \code{fan} or \code{boxfan}.By default takes the same value as \code{roffset}. See \code{\link{text}}.
+}
+  \item{lcex}{
+Text size of left labels for the \code{fan} or \code{boxfan}. By default takes the same value as \code{rex}. See \code{\link{text}}.
+}
+  \item{lcol}{
+Colour of text for left labels for the \code{fan} or \code{boxfan}.  By default takes the same value as \code{rcol}. See \code{\link{text}}.
+}
+  \item{upplab}{
+Prefix character string for upper labels to be used for the \code{fan} or \code{boxfan} when \code{type="interval"} 
+}
+  \item{lowlab}{
+Prefix character string for lower labels to be used for the \code{fan} or \code{boxfan} when \code{type="interval"} 
+}
+  \item{medlab}{
+Character string for median label.
+}
+  \item{n.spag}{
+Number of simulations to plot in the \code{spaghetti} plot
+}
+  \item{space}{
+Space between boxes in the \code{boxfan} plot
 }
   \item{\dots}{
-Additional arguments passed to \code{lines}.
+Additional arguments passed to \code{\link{boxplot}}.
 }
 }
 \details{
-Returns a plot of the percentiles given in the \code{psims} argument. Additional lines and text are added to illustrate major contours on the probability distribution. By default these run on every decile. Text is automatically added where lines are drawn. Hence, if text is only required where there are contour lines, there is no need to specify anything in the \code{txt} argument. Text can also be suppressed and added later using \code{\link{fan.txt}}. Lines can be suppressed by adding \code{type = NULL}. Colours are by default taken from the \code{heat.colors} palette. Alternatives can be specified using \code{fan.col}. The joining of a forecast fan to data is controlled be the anchor argument in the \code{\link{pn}} function.
+Visualise sequential distributions using a range of plotting styles. Sequential distribution data can be input as either simulations or pre-computed values over time (columns). For the later, the user should declare input data as percentiles by setting \code{data.type = "values"}. Plots are added to existing graphic devices. Users can choose from four different styles.
+
+The \code{fan} and \code{boxfan} style plot distributions based on used-defined shading scheme, controlled by the \code{fan.col} argument. Additional lines and text are added to illustrate major contours on the probability distribution. Lines and labels can be suppressed by adding \code{ln = NULL} and \code{rlab = NULL}. Labels to the left of the fan can also be specified using the \code{llab} argument. Colours are by default taken from the \code{\link{heat.colors}} palette. Alternatives can be specified using \code{fan.col} (see the example below). The joining of a forecast fan to data is controlled be the anchor argument.
+
+The \code{spaghetti} style, plots random draws (when \code{data.type = "simulations"} is set) along the sequence of distributions. The number of draws is controlled by the \code{n.spag} argument. The transparency of the lines is controlled by \code{alpha}.
+
+The \code{boxplot} style, adds a box plot for simulated data at the appropriate location, according to the \code{start} and \code{frquency} arguments. Gaps between box plots are controlled by \code{space} argument. Additional arguments are passed to \code{\link{boxplot}}.
 }
 \value{
-See Details
+See details
 }
 \author{
 Guy J. Abel
 }
-
 \seealso{
-\code{\link{pn}}, \code{\link{fan.txt}}, \code{\link{fan.fill}}
+\code{\link{fan}}
 }
 \examples{
-# calculate percentiles across time
-th.pn <- pn(sims = th.mcmc)
-
 ##
-##Default
+##fan
 ##
 # empty plot
-plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
 
 # add fan
-fan(th.pn)
+fan(th.mcmc)
 
-##
-##No text (can be added later with fan.txt)
-##
-# empty plot
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
-# add fan
-fan(th.pn, text=NULL)
+# coarser fan
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, probs = seq(10, 90, 10))
 
+# fan with no lines and text
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, probs = seq(10, 90, 10), ln = NULL, rlab = NULL)
 
-##
-##Text at both ends and lines also at 1st and 99th percentiles
-##
-# empty plot
-plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
-     ylim = range(th.pn), ylab = "Theta")
+# black lines
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, probs = seq(10, 90, 10), ln.col = "black")
 
-# add fan
-fan(th.pn, txt = NULL, ln = c(1,10,30,50,70,90,99))
-
-# add text labels for percentiles
-fan.txt(th.pn, pn.r = c(1,10,50,90,99))
-fan.txt(th.pn, pn.l = c(1,30,70,99))
-
-
-##
-##Different colours
-##
-# calculate percentiles across time
-sigma.pn <- pn(sims = sqrt(exp(th.mcmc)))
-
-# define colours
+# different colour scheme
 pal <- colorRampPalette(c("royalblue", "grey", "white"))
-fancol <- pal(50)
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, probs = seq(10, 90, 10), fan.col = pal)
 
-# empty plot
-plot(NULL, type = "l", xlim = c(1, 945), xlab = "Time", xaxt = "n",
-     ylim = range(sigma.pn), ylab = "Standard Deviation")
-     
-# add fan
-fan(sigma.pn, fan.col = fancol, ln = c(1, 10, 50, 90, 99))
+# transparant fan fill to leave only percentile contor lines
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, probs = seq(10, 90, 10), alpha=0, ln.col="black")
 
+# prediction interval
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, type = "interval")
+
+# left labels too
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, type = "interval", llab = TRUE)
+
+# emphesis median line
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, type = "interval", llab = TRUE , med.col="orange")
+
+# change prefixes of labels
+plot(NULL, type = "n", xlim = c(1 - 20, 945 + 20), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, type = "interval", llab = TRUE, rcex = 0.5,
+ upplab = "Upp ", lowlab = "Low ", medlab="Med")
 
 ##
-##Prediction Intervals
+## spaghetti plot
 ##
-th.pn <- pn(sims = th.mcmc, type="intervals")
-head(th.pn)
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
-fan(th.pn, ln=c(50,90), hl.lab=c("L","U"))
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, style = "spaghetti")
 
-\dontrun{
+# less transparency
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, style = "spaghetti", alpha = 0.5)
+
+# more lines, red.
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc, style = "spaghetti", ln.col = "red", n.spag = 100)
+
 ##
-##Forecast fans 1) default 2) coarser colours, different contour line colour and anchoring fan
+## boxplots
 ##
-# create BUGS model
-library("tsbugs")
-r <- ts(ew[2:167]/ew[1:166]-1, start=1841)
-y <- diff(r) 
-pop.bug <- sv.bugs(y, k=25, sim=TRUE,
-                  sv.mean.prior2 = "dgamma(0.000001,0.000001)", 
-                  sv.ar.prior2 = "dunif(-0.999, 0.999)")
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc[, seq(1, 945, 21)], style = "boxplot", frequency = 1/21)
 
-# run in OpenBUGS
-library("R2OpenBUGS")
-writeLines(pop.bug$bug, "pop.txt")
-pop <- bugs(data = pop.bug$data,
-            inits = list(list(psi0.star=exp(12), psi1=0.5, itau2=0.5)),
-            param = c("psi0", "psi1", "tau", "y.new", "y.sim"),
-            model = "pop.txt", 
-            n.iter = 11000, n.burnin = 1000, n.chains = 1)
+# additional arguments for boxplot
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc[, seq(1, 945, 21)], style = "boxplot", frequency = 1/21, 
+ outline = FALSE, col = "red", notch = TRUE)
 
-# derive posterior predictive distributions of the population growth rate and population total
-ynew.mcmc <- pop$sims.list$y.new
-rnew.mcmc <- apply(ynew.mcmc, 1, diffinv, xi = tail(r,1))
-rnew.mcmc <- t(rnew.mcmc[-1,])
+##
+## boxfan
+##
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc[, seq(1, 945, 21)], style = "boxfan", type = "interval", frequency = 1/21)
 
-pnew.mcmc <- apply(1+rnew.mcmc, 1, cumprod) * tail(ew,1)
-pnew.mcmc <- t(pnew.mcmc)
+# more space between boxes
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+fan(th.mcmc[, seq(1, 945, 21)], style = "boxfan", type = "interval", 
+ frequency = 1/21, space = 10)
 
-# calculate percentiles across time
-r0 <- tsp(r)[2]
-rnew.pn <- pn(sims = rnew.mcmc, start = r0 + 1)
-pnew.pn <- pn(sims = pnew.mcmc/1e+06, start = r0 + 1, anchor = tail(ew/1e+06, 1),) 
-
-# plot ew
-par(mfrow = c(1 ,2))
-plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Population (m)", lwd = 2)
-     
-# add fan    
-fan(pnew.pn)
-
-# plot ew
-plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Population (m)", lwd = 2)
-     
-# add fan
-fan(pnew.pn2, ln.col = "black")
-}
+# impose spaghetti
+fan(th.mcmc[, seq(1, 945, 21)], style = "spaghetti", 
+ frequency = 1/21, n.spag = 50, ln.col = "red") 
 }
 \keyword{ aplot }

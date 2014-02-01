@@ -4,10 +4,12 @@
 Calculate Percentiles of Sequential Simulation Data
 }
 \description{
-Creates a \code{pn} object, the essential input object into the \code{\link{fan}} function, to plot sequential distrbution data.
+This function is no longer recommended. Was intended for use with original \code{fan} function (which now goes by \code{\link{fan0}}).
+
+Creates a \code{pn} object, the essential input object into the \code{\link{fan0}} function, to plot sequential distrbution data.
 }
 \usage{
-pn(sims, p = 1:50, p.int=NULL, anchor=NULL, type="percentile", ...)
+pn(sims, p = 1:50, anchor=NULL, ...)
 }
 \arguments{
   \item{sims}{
@@ -16,14 +18,8 @@ Set of sequential simulation data, where rows represent simulation number and co
   \item{p}{
 Percentiles to be calculated, and later plotted using the \code{fan} function. These must be between 0 and 100 (inclusive). Percentiles greater than 50, if not given, are automatically calculated as 100-\code{p}, to ensure symmetric fan. Values can be non-integers.
 }
-  \item{p.int}{
-Prediction intervals to be calculated, when \code{type="interval"} and later plotted using the \code{fan} function. These must be between 0 and 100 (inclusive). Values can be non-integers. By default is \code{NULL}. When \code{type="interval"} is set, default prediction intervals of \code{p.int=c(50,80,95)} are taken.
-}
   \item{anchor}{
 Optional data value to anchor a forecast fan on. Typically this will be the last observation of the observed data series.
-}
-  \item{type}{
-Calculate percentiles or prediction intervals. Can take either \code{"percentile"} or \code{"interval"}.
 }
   \item{\dots}{
 Other arguments passed to add \code{ts} type attiributes. Typically one should give a value for \code{start}.
@@ -42,9 +38,8 @@ See details
 \author{
 Guy J. Abel
 }
-
 \seealso{
-\code{\link{fan}}
+\code{\link{fan}} \code{\link{fan0}}
 }
 \examples{
 ##
@@ -58,23 +53,13 @@ th.pn2 <- pn(sims = th.mcmc, p = c(1, 10, 40, 50))
 plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
 
 # add fan
-fan(th.pn)
+fan0(th.pn)
 
 # empty plot
 plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
 
 # add coarser fan
-fan(th.pn2) 
-
-##
-##Prediction intervals
-##
-th.pn <- pn(sims = th.mcmc, p.int=seq(10,90,10), type="intervals")
-head(th.pn)
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
-fan(th.pn, ln=c(50,80,90))
-fan.txt(th.pn, pn.l = c(10,30,70), hl.lab=c("L","U"))
-
+fan0(th.pn2) 
 
 \dontrun{
 ##
@@ -115,12 +100,12 @@ par(mfrow = c(1 ,2))
 plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Population (m)", lwd = 2)
      
 # add fan    
-fan(pnew.pn)
+fan0(pnew.pn)
 
 # plot ew
 plot(ew/1e+06, ylim = c(40, 80), xlim = c(1940, 2040), ylab = "Population (m)", lwd = 2)
      
 # add fan
-fan(pnew.pn2, ln.col = "black")
+fan0(pnew.pn2, ln.col = "black")
 }
 }

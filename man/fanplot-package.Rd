@@ -5,12 +5,12 @@
 fanplot
 }
 \description{
-The fanplot package contains a collection of R functions to effectively display plots of sequential distributions such as probabilistic forecasts or posterior distrubtions of volatilty estimates.
+The fanplot package contains a collection of R functions to effectively display plots of sequential distributions such as probabilistic forecasts or simulation results.
 }
 \details{
- The plotting of distributions are based around two functions. The first, pn, calculates the percentiles for a set of sequential distributions over a specified time period. The second, fan, plots the calculated percentiles of the sequential distributions. The resulting plot is a set of coloured polygon, with shadings corresponding to the percentile values.
+Visualise sequential distributions using a range of plotting styles. Sequential distribution data can be input as either simulations or percentiles over time (columns). Plots are added to existing graphic devices using the \code{fan} function. Users can choose from four different styles, including fan chart type plots, where a set of coloured polygon, with shadings corresponding to the percentile values are layered to represent different uncertainty levels.
 \tabular{ll}{
-Package: \tab tsbugs\cr
+Package: \tab fanplot \cr
 Type: \tab Package\cr
 License: \tab GPL-2\cr
 }
@@ -23,12 +23,9 @@ Blog posts with many additional details of the implementation of functions in th
 \url{http://gjabel.wordpress.com/category/r/fanplot/} 
 }
 \examples{
-# calculate percentiles across time
-th.pn <- pn(sims = th.mcmc)
-
 # empty plot
-plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
+plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
 
 # add fan
-fan(th.pn)
+fan(th.mcmc)
 }

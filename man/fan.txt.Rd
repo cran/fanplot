@@ -4,11 +4,13 @@
 Text Labels for Specified Percentiles
 }
 \description{
+This function is no longer recommended. Was intended for use with original \code{fan} function (which now goes by \code{\link{fan0}}).
+
 Adds text labels beside relevant percentiles.
 }
 \usage{
 fan.txt(psims, pn.r = NULL, pn.l = NULL, 
-pos = NULL, offset = NULL, cex=0.8, hl.lab=NULL,...)
+pos = NULL, offset = NULL, cex=0.8,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,10 +32,7 @@ Offset for \code{pos}. Passed directly to \code{offset} argument in \code{text}.
   \item{cex}{
 Text size of labels. Passed directly to \code{text}.
 }
-  \item{hl.lab}{
-String of length 2, with low/lowest/bottom labels first and high/highest/top labels second.
-}
-  \item{\dots}{
+ \item{\dots}{
 Additional arguments passed to \code{text} to control label characteristics.
 }
 }
@@ -61,7 +60,7 @@ th.pn <- pn(sims = th.mcmc)
 plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
 
 # add fan
-fan(th.pn, txt = NULL)
+fan0(th.pn, txt = NULL)
 
 # add text
 fan.txt(th.pn, pn.l = c(1, 10, 50, 90, 99))
@@ -74,20 +73,10 @@ fan.txt(th.pn, pn.r = c(1, seq(10, 90, 20), 99))
 plot(NULL, type = "n", xlim = c(1, 945),  ylim = range(th.pn), ylab = "Theta")
 
 # add fan
-fan(th.pn, txt = NULL)
+fan0(th.pn, txt = NULL)
 
 # add text
 fan.txt(th.pn, pn.l = c(1, 10, 50, 90, 99), pos = 1, offset = 0)
 fan.txt(th.pn, pn.r = c(1, seq(10, 90, 20), 99), col = "royalblue", cex = 2) 
-
-##
-##Prediction Intervals
-##
-th.pn <- pn(sims = th.mcmc, p.int=seq(10,90,10), type="intervals")
-head(th.pn)
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.pn), ylab = "Theta")
-fan(th.pn, ln=c(50,80,90), hl.lab=c("L","U"))
-fan.txt(th.pn, pn.l = c(10,30,70), hl.lab=c("L","U"))
-
 }
 \keyword{ aplot }
