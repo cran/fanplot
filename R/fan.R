@@ -4,12 +4,12 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
               start = 1, frequency = 1, anchor = NULL, 
               fan.col = heat.colors, alpha = if (style == "spaghetti") 0.2 else 1, 
               n.fan = NULL,
-              ln = if(length(probs)<10) probs else probs[round(probs,5)==round(seq(0.1, 0.9, 0.1),5)],
+              ln = if(length(probs)<10) probs else probs[round(probs,5) %in% round(seq(0.1, 0.9, 0.1),5)],
               med.ln = if(type=="interval") TRUE else FALSE, 
-              ln.col = NULL, med.col= NULL,
+              ln.col = NULL, med.col= "orange",
               rlab = ln, rpos = 4, roffset = 0.1, rcex = 0.8, rcol = NULL, 
               llab = FALSE, lpos = 2, loffset = roffset, lcex = rcex, lcol = rcol, 
-              upplab = "U", lowlab = "L", medlab="M",
+              upplab = "U", lowlab = "L", medlab=if(type == "interval") "M" else NULL,
               n.spag = 30, 
               space = if(style=="boxplot") 1/frequency else 0.9/frequency, ...){
   if(class(data)=="pn"){
@@ -104,45 +104,44 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
         }
       }
     }
-    
+    #ln=seq(5,95,15); llab=seq(5,95,15); rlab=c(80,50,20); 
+    #ensure rlab will evaluate to original ln rather than altered
+    ln0<-ln
     #ensure ln is okay
-    if(!is.null(ln)){
-      rlab <- ln #otherwise will evaluate after messed with ln
-      if(min(ln)<0 | max(ln)>100)
+    if(!is.null(ln0)){
+      if(min(ln0)<0 | max(ln0)>100)
         stop("all ln must be between 0 and 1 (or 0 and 100)")
-      if(max(ln)>1)
-        ln<-ln/100
-      
+      if(max(ln0)>1)
+        ln0<-ln0/100
       #default lines on available pi
       if(type=="interval"){
-        ln <- c(ln + (1-ln)/2, 1 - ln - (1-ln)/2)
-        ln<-sort(ln)
+        ln0 <- c(ln0 + (1-ln0)/2, 1 - ln0 - (1-ln0)/2)
+        ln0 <-sort(ln0)
       }
       if(is.null(ln.col))
         ln.col<-fan.col[1]
-      ln<-round(ln,5)
+      ln0<-round(ln0,5)
       if(style=="fan"){
-        for(i in  match(ln, p))
+        for(i in match(ln0, p))
           lines(pp[,i], col=ln.col)
       }
       if(style=="boxfan"){
         for(i in 1:nrow(pp)){
-          for(j in match(ln, p)){
+          for(j in match(ln0, p)){
             lines(x=start+(i-1)/frequency+c(-0.5,0.5)*space, y=rep(pp[i,j],2), col=ln.col)
           }
         }
       }
-      if(is.na(sum(match(ln,p))))
+      if(is.na(sum(match(ln0,p))))
         print("some lines not plotted as conflict with precentiles given in probs")
     }
-    
     #names will be plotted in text
     if(data.type=="values" & type=="percentile")
       colnames(pp)<-paste0(p*100, "%")
     #default right text on available deciles
     if(!is.null(rlab)){
       if(min(rlab)<0 | max(rlab)>100)
-        stop("all ln must be between 0 and 1 (or 0 and 100)")
+        stop("all rlab must be between 0 and 1 (or 0 and 100)")
       if(max(rlab)>1)
         rlab<-rlab/100
       if(type=="interval")
@@ -150,7 +149,8 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
       rlab<-sort(rlab)
       rlab<-round(rlab, 5)
       if(style=="fan")
-        text(tsp(pp)[2], pp[nrow(pp),match(rlab,p)], names(pp[1,match(rlab,p)]), pos=rpos, offset=roffset, cex=rcex, col=rcol)
+        for(i in match(rlab, p))
+          text(tsp(pp)[2], pp[nrow(pp),i], names(pp[1,i]), pos=rpos, offset=roffset, cex=rcex, col=rcol)
       if(style=="boxfan")
         text(tsp(pp)[2]+0.5*space, pp[nrow(pp),match(rlab,p)], names(pp[1,match(rlab,p)]), pos=rpos, offset=roffset, cex=rcex, col=rcol)
       if(is.na(sum(match(rlab,p))))
@@ -158,7 +158,7 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
     }
     if(is.numeric(llab[1])){
       if(min(llab)<0 | max(llab)>100)
-        stop("all ln must be between 0 and 1 (or 0 and 100)")
+        stop("all llab must be between 0 and 1 (or 0 and 100)")
       if(max(llab)>1)
         llab<-llab/100
       if(type=="interval")
@@ -172,7 +172,7 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
       if(is.na(sum(match(llab,p))))
         print("some left labels not plotted as conflict with precentiles given in probs")
     }
-    if(llab==TRUE){
+    if(llab[1]==TRUE){
       llab<-rlab
       if(style=="fan")
         text(tsp(pp)[1], pp[1,match(llab,p)], names(pp[1,match(llab,p)]), pos=lpos, offset=loffset, cex=lcex, col=lcol)
@@ -185,10 +185,13 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
   
   #add median line
   if(med.ln==TRUE & data.type=="simulations"){
-    pm<-apply(data,2,median)
+    pp<-data
+    pm<-apply(pp,2,median)
     if(!is.null(anchor))
       pm<-c(anchor,pm)
     pm<-ts(pm, start=start, frequency=frequency)
+    if(!is.null(anchor))
+      pm<-lag(pm)
     if(is.null(med.col))
       med.col<-ln.col
     if(style=="fan" | style=="spaghetti"){

@@ -12,12 +12,13 @@ fan(data = NULL, data.type = "simulations", style = "fan", type = "percentile",
  start = 1, frequency = 1, anchor = NULL, 
  fan.col = heat.colors, alpha = if (style == "spaghetti") 0.2 else 1, 
  n.fan = NULL, 
- ln = if(length(probs)<10) probs else probs[round(probs,5)==round(seq(0.1, 0.9, 0.1),5)],
+ ln = if(length(probs)<10) probs 
+        else probs[round(probs,5) \%in\% round(seq(0.1, 0.9, 0.1),5)],
  med.ln = if(type=="interval") TRUE else FALSE,
- ln.col = NULL, med.col= NULL,
+ ln.col = NULL, med.col= "orange",
  rlab = ln, rpos = 4, roffset = 0.1, rcex = 0.8, rcol = NULL, 
  llab = FALSE, lpos = 2, loffset = roffset, lcex = rcex, lcol = rcol, 
- upplab = "U", lowlab = "L", medlab="M",
+ upplab = "U", lowlab = "L", medlab=if(type == "interval") "M" else NULL,
  n.spag = 30, 
  space = if (style == "boxplot") 1/frequency else 0.9/frequency, ...)
 }
@@ -176,9 +177,9 @@ fan(th.mcmc, type = "interval")
 plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
 fan(th.mcmc, type = "interval", llab = TRUE)
 
-# emphesis median line
+# selected right labels
 plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, type = "interval", llab = TRUE , med.col="orange")
+fan(th.mcmc, llab=c(0.1,0.5,0.9), rlab=c(0.2,0.5,0.8))
 
 # change prefixes of labels
 plot(NULL, type = "n", xlim = c(1 - 20, 945 + 20), ylim = range(th.mcmc), ylab = "Theta")
@@ -221,7 +222,7 @@ plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
 fan(th.mcmc[, seq(1, 945, 21)], style = "boxfan", type = "interval", 
  frequency = 1/21, space = 10)
 
-# impose spaghetti
+# overlay spaghetti
 fan(th.mcmc[, seq(1, 945, 21)], style = "spaghetti", 
  frequency = 1/21, n.spag = 50, ln.col = "red") 
 }
