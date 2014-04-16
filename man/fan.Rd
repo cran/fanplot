@@ -9,13 +9,13 @@ Visualise sequential distributions using a range of plotting styles.
 \usage{
 fan(data = NULL, data.type = "simulations", style = "fan", type = "percentile", 
  probs = if (type == "percentile") seq(0.01, 0.99, 0.01) else c(0.5, 0.8, 0.95), 
- start = 1, frequency = 1, anchor = NULL, 
- fan.col = heat.colors, alpha = if (style == "spaghetti") 0.2 else 1, 
+ start = 1, frequency = 1, anchor = NULL, anchor.time=NULL,
+ fan.col = heat.colors, alpha = if (style == "spaghetti") 0.25 else 1, 
  n.fan = NULL, 
  ln = if(length(probs)<10) probs 
         else probs[round(probs,5) \%in\% round(seq(0.1, 0.9, 0.1),5)],
  med.ln = if(type=="interval") TRUE else FALSE,
- ln.col = NULL, med.col= "orange",
+ ln.col = if(style=="spaghetti") "gray" else NULL, med.col= "orange",
  rlab = ln, rpos = 4, roffset = 0.1, rcex = 0.8, rcol = NULL, 
  llab = FALSE, lpos = 2, loffset = roffset, lcex = rcex, lcol = rcol, 
  upplab = "U", lowlab = "L", medlab=if(type == "interval") "M" else NULL,
@@ -25,7 +25,9 @@ fan(data = NULL, data.type = "simulations", style = "fan", type = "percentile",
 \arguments{
   \item{data}{
 Set of sequential simulation data, where rows represent simulation number and columns represent some form of time index. 
-If \code{data.type = "values"}, switches to data, where rows represent values for a set of probabilities (which need to be provided in \code{probs} and columns represent some form of time index.
+If \code{data.type = "values"}, data must instead be a set of quantile values by rows for a set of probabilities (which need to be provided in \code{probs} and by column for some form of time index.
+
+Data can take multiple classes, where the contents are converted to a \code{matrix}. If the input is a \code{mts} or \code{zoo}, the time series properties will be inherted (and \code{start} and \code{frequency} arguments will be ignored).
 
 When the object is of (old style) type \code{pn.ts} all relevant arguments are sent to \code{fan0}.
 }
@@ -50,6 +52,9 @@ The number of distribution in \code{sims} per unit of time in \code{sims}. Simil
   \item{anchor}{
 Optional data value to anchor a forecast fan on. Typically this will be the last observation of the observed data series.
 }
+  \item{anchor.time}{
+Optional data value for the time of the anchor. Useful for irregular time series.
+}
   \item{fan.col}{
 Palette of colours used in the \code{fan} or \code{boxfan}.
 }
@@ -66,7 +71,7 @@ Vector of number to plot contour lines on-top \code{fan} or \code{boxfan}. Must 
 Add a median line to fan. Might be of particular use if \code{type="interval"}. Only works when \code{data.type = "simulations"} and one of \code{fan}, \code{boxfan} or \code{spaghetti} styles.
 }
   \item{ln.col}{
-Line colour to be imposed on top of the fan. By default takes the darkest colour from \code{fan.col} argument.
+Line colour to be imposed on top of the fan. By default takes the darkest colour from \code{fan.col} argument, unless \code{style="spaghetti"}
 }
   \item{med.col}{
 Median Line colour. By default this is set to the first colour in \code{fan.col}. Users might wish to change to highlight the median.
@@ -140,90 +145,77 @@ Guy J. Abel
 }
 \examples{
 ##
-##fan
+## Basic Fan
 ##
 # empty plot
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
+plot(NULL, xlim = c(1, 945), ylim = range(th.mcmc)*0.85)
 
 # add fan
 fan(th.mcmc)
 
-# coarser fan
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, probs = seq(10, 90, 10))
-
-# fan with no lines and text
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, probs = seq(10, 90, 10), ln = NULL, rlab = NULL)
-
-# black lines
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, probs = seq(10, 90, 10), ln.col = "black")
-
-# different colour scheme
-pal <- colorRampPalette(c("royalblue", "grey", "white"))
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, probs = seq(10, 90, 10), fan.col = pal)
-
-# transparant fan fill to leave only percentile contor lines
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, probs = seq(10, 90, 10), alpha=0, ln.col="black")
-
-# prediction interval
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, type = "interval")
-
-# left labels too
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, type = "interval", llab = TRUE)
-
-# selected right labels
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, llab=c(0.1,0.5,0.9), rlab=c(0.2,0.5,0.8))
-
-# change prefixes of labels
-plot(NULL, type = "n", xlim = c(1 - 20, 945 + 20), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, type = "interval", llab = TRUE, rcex = 0.5,
- upplab = "Upp ", lowlab = "Low ", medlab="Med")
+##
+## 20 or so examples of fan charts and
+## spaghetti plots based on the th.mcmc object
+##
+## Make sure you have zoo, tsbugs, RColorBrewer and 
+## colorspace packages installed
+##
+\dontrun{
+demo("sv_fan", "fanplot")
+}
 
 ##
-## spaghetti plot
+## Fans for forecasted values
 ##
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, style = "spaghetti")
+\dontrun{
+#create time series
+net <- ts(ips$net, start=1975)
 
-# less transparency
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, style = "spaghetti", alpha = 0.5)
+# fit model
+library("forecast")
+m <- auto.arima(net)
 
-# more lines, red.
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc, style = "spaghetti", ln.col = "red", n.spag = 100)
+# simulate future values
+mm <- matrix(NA, nrow=1000, ncol=5)
+for(i in 1:1000)
+  mm[i,] <- simulate(m, nsim=5)
+
+# interval fan chart
+plot(net, xlim=c(1975,2020), ylim=c(-100,300))
+fan(mm, type="interval", start=2013)
+
+# anchor fan chart
+plot(net, xlim=c(1975,2020), ylim=c(-100,300))
+fan(mm, type="interval", start=2013, 
+    anchor=net[time(net)==2012])
+}
 
 ##
-## boxplots
+## Box Plots
 ##
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc[, seq(1, 945, 21)], style = "boxplot", frequency = 1/21)
+# sample every 21st date of theta_t
+th.mcmc21 <- th.mcmc[, seq(1, 945, 21)]
+plot(NULL, xlim = c(1, 945), ylim = range(th.mcmc21))
+fan(th.mcmc21, style = "boxplot", frequency = 1/21)
 
 # additional arguments for boxplot
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc[, seq(1, 945, 21)], style = "boxplot", frequency = 1/21, 
+plot(NULL, xlim = c(1, 945), ylim = range(th.mcmc21))
+fan(th.mcmc21, style = "boxplot", frequency = 1/21, 
  outline = FALSE, col = "red", notch = TRUE)
 
 ##
-## boxfan
+## Fan Boxes
 ##
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc[, seq(1, 945, 21)], style = "boxfan", type = "interval", frequency = 1/21)
+plot(NULL, xlim = c(1, 945), ylim = range(th.mcmc21))
+fan(th.mcmc21, style = "boxfan", type = "interval", frequency = 1/21)
 
 # more space between boxes
-plot(NULL, type = "n", xlim = c(1, 945), ylim = range(th.mcmc), ylab = "Theta")
-fan(th.mcmc[, seq(1, 945, 21)], style = "boxfan", type = "interval", 
+plot(NULL, xlim = c(1, 945), ylim = range(th.mcmc21))
+fan(th.mcmc21, style = "boxfan", type = "interval", 
  frequency = 1/21, space = 10)
 
 # overlay spaghetti
-fan(th.mcmc[, seq(1, 945, 21)], style = "spaghetti", 
- frequency = 1/21, n.spag = 50, ln.col = "red") 
+fan(th.mcmc21, style = "spaghetti", 
+ frequency = 1/21, n.spag = 50, ln.col = "red", alpha=0.2) 
 }
 \keyword{ aplot }
