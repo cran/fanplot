@@ -181,7 +181,15 @@ shinyServer(function(input, output) {
 #     updatedf1()
     df1<-getdf1()
     df1[-1,]
-  })
+  }, options = list(bFilter = FALSE, bAutoWidth =FALSE, bInfo=FALSE, bPaginate=FALSE))
+
+  output$downloaddf <- downloadHandler(
+    filename = function() { "df.csv" },
+    content = function(filename) {
+      df1<-getdf1()
+      write.csv(df1[-1,], row.names = FALSE)
+    }
+  )
 #   output$value<- renderPrint({
 # #         Sys.getlocale()
 # #     print(net)

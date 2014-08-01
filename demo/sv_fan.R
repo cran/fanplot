@@ -145,7 +145,7 @@ plot(NULL, xlim = c(-20, 965), ylim = range(th.mcmc)*0.85, main="Spaghetti and F
 # transparent fan with visible lines
 fan(th.mcmc, ln=c(5, 50, 95), llab=TRUE, alpha=0, ln.col="orange", )
 # spaghetti lines
-fan(th.mcmc, style="spaghetti", alpha=0.25)
+fan(th.mcmc, style="spaghetti")
 
 
 ##

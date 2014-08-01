@@ -269,6 +269,10 @@ function(data = NULL, data.type="simulations", style = "fan", type = "percentile
   ##
   if(style=="spaghetti"){
     ps<-as.matrix(data)
+    #add ancohor
+    if(!is.null(anchor)){
+      ps<-cbind(rep(anchor,n),ps)
+    }
     ps<-t(ps)
     n<-ncol(ps)
     spag.col<-adjustcolor(ln.col,alpha.f=alpha)

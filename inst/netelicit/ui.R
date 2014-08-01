@@ -46,7 +46,9 @@ shinyUI(pageWithSidebar(
                 max = 0.99,
                 value = 0,
                 step=0.01),
-    br()
+    br(),
+    helpText("Download Data:"),
+    downloadButton('downloaddf', 'Data')
   ),
   # Show a plot of the generated distribution
   mainPanel(
