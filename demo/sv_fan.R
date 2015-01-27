@@ -143,7 +143,7 @@ fan(th.mcmc, style = "spaghetti", ln.col = "red", n.spag = 100, alpha = 0.1)
 # 20. Overlay spaghetti on transparent fan.
 plot(NULL, xlim = c(-20, 965), ylim = range(th.mcmc)*0.85, main="Spaghetti and Fan")
 # transparent fan with visible lines
-fan(th.mcmc, ln=c(5, 50, 95), llab=TRUE, alpha=0, ln.col="orange", )
+fan(th.mcmc, ln=c(5, 50, 95), llab=TRUE, alpha=0, ln.col="orange" )
 # spaghetti lines
 fan(th.mcmc, style="spaghetti")
 

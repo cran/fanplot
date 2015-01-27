@@ -9,7 +9,6 @@ MCMC simulations of volatility obtained from the \code{bugs} function in the R2O
 
 Larger simulations (without thinning) can be obtained using the data (\code{svpdx}) and the my1.txt BUGS file contained in this package, see example below.
 }
-\usage{data(th.mcmc)}
 \details{
 See Meyer and Yu (2010) for model specification.
 }
@@ -32,11 +31,12 @@ fan(th.mcmc)
 library("tsbugs")
 library("R2OpenBUGS")
 # write model file:
-my1.bug <- dget(system.file("model", "my1.txt", package = "fanplot"))
+my1.bug <- dget(system.file("model", "my1.R", package = "fanplot"))
 write.model(my1.bug, "my1.txt")
 # take a look:
 file.show("my1.txt")
-# run openbugs
+# run openbugs, remember to include theta as a param otherwise will not
+# have anything to plot
 my1.mcmc<-bugs(data=list(n=length(svpdx$pdx),y=svpdx$pdx), 
                inits=list(list(phistar=0.975,mu=0,itau2=50)),
                param=c("mu","phi","tau","theta"), 

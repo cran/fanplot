@@ -1,8 +1,8 @@
 rsplitnorm <-
-function(n, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
-  n <- max(n,length(mean),length(sd),length(skew),length(sd1),length(sd2))
-  if(length(mean)<n)
-    mean[1:n]<-mean
+function(n, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
+  n <- max(n,length(mode),length(sd),length(skew),length(sd1),length(sd2))
+  if(length(mode)<n)
+    mode[1:n]<-mode
   if(length(sd)<n)
     sd[1:n]<-sd
   if(length(skew)<n)
@@ -27,6 +27,6 @@ function(n, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
   if (any(findInterval(skew, c(-1,1), rightmost.closed=TRUE)!=1) )
     stop("skew must be between -1 and 1")
   u <- runif(n)
-  f <- qsplitnorm(u, mean = mean, sd = sd, skew = skew, sd1 = sd1, sd2 = sd2)
+  f <- qsplitnorm(u, mode = mode, sd = sd, skew = skew, sd1 = sd1, sd2 = sd2)
   f
 }

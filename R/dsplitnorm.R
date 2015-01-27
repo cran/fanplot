@@ -1,10 +1,10 @@
 dsplitnorm <-
-function(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
-  n <- max(length(x),length(mean),length(sd),length(skew),length(sd1),length(sd2))
+function(x, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
+  n <- max(length(x),length(mode),length(sd),length(skew),length(sd1),length(sd2))
   if(length(x)<n)
     x[1:n]<-x
-  if(length(mean)<n)
-    mean[1:n]<-mean
+  if(length(mode)<n)
+    mode[1:n]<-mode
   if(length(sd)<n)
     sd[1:n]<-sd
   if(length(skew)<n)
@@ -30,9 +30,9 @@ function(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
     stop("skew must be between -1 and 1")
   f <- rep(NA, n)
   c <- sqrt(2/pi)/(sd1 + sd2)
-  x1 <- x <= mean
-  x2 <- x > mean
-  f[x1] <- c[x1] * exp((-(x[x1] - mean[x1])^2)/(2 * var1[x1]))
-  f[x2] <- c[x2] * exp((-(x[x2] - mean[x2])^2)/(2 * var2[x2]))
+  x1 <- x <= mode
+  x2 <- x > mode
+  f[x1] <- c[x1] * exp((-(x[x1] - mode[x1])^2)/(2 * var1[x1]))
+  f[x2] <- c[x2] * exp((-(x[x2] - mode[x2])^2)/(2 * var2[x2]))
   return(f)
 }

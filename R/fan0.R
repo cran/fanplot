@@ -1,37 +1,33 @@
 fan0 <-
-function(psims, fan.col=heat.colors(floor(dim(psims)[2]/2)), ln.col=fan.col[1],
-	ln=seq(10,90,10), txt=ln, ...){
-  
-	#check if pn.ts
-	if(class(psims)!="pn")
-		stop("psims must be a pn object (use pn function)")
-	if(!is.null(ln))
-		if(min(ln)<0 | max(ln)>100)
-			stop("all lines must be on a percentiles, indicated by a number between 0 and 100")
-
-	#extract percentiles in psims and identify type
-	p<-colnames(psims)
-	p<-gsub("%","",p)
-  p<-as.numeric(p)
-	n<-length(p)
-	psims<-as.ts(psims)
-	#plot polygons
-	for(i in 1:floor(n/2)){
-    fan.fill(ts1=psims[,i],ts2=psims[,n-i+1],fan.col=fan.col[floor(n/2)-i+1])
-	}
-	#default lines on deciles
-  ln<-ln[ln %in% p]
-	for(i in match(ln,p)){
-		lines(psims[,i], col=ln.col, ...)
-	}
-	if(is.na(sum(match(ln,p))))
-	  print("some lines not drawn as not in calculated in psims")
-  
-  #text by lines
-  if(!is.null(txt)){
-    txt<-ln[ln %in% p]
-  }	
-	if(!is.null(tsp(psims)))	class(psims)<-"pn"
-	fan.txt(psims,pn.r=txt)
-	box()
-}
+  function(data = NULL, data.type = "simulations", style = "fan", type = "percentile",
+           probs = if(type=="percentile") seq(0.01, 0.99, 0.01) else c(0.5, 0.8, 0.95), 
+           start = 1, frequency = 1, anchor = NULL, anchor.time=NULL,
+           fan.col = heat.colors, alpha = if (style == "spaghetti") 0.5 else 1, 
+           n.fan = NULL,
+           ln = NULL,
+           med.ln = if(type=="interval") TRUE else FALSE, 
+           ln.col = if(style=="spaghetti") "gray" else NULL, med.col= "orange",
+           rlab = ln, rpos = 4, roffset = 0.1, rcex = 0.8, rcol = NULL, 
+           llab = FALSE, lpos = 2, loffset = roffset, lcex = rcex, lcol = rcol, 
+           upplab = "U", lowlab = "L", medlab=if(type == "interval") "M" else NULL,
+           n.spag = 30, 
+           space = if(style=="boxplot") 1/frequency else 0.9/frequency, 
+           add = TRUE, ylim = range(data)*0.8,...){
+    if(add==TRUE)
+      plot(data[,1], type="n", ylim=ylim, ...)
+    fan(data = data, data.type=data.type, style = style, type = type,
+    probs = probs, 
+    start = start, frequency = frequency, anchor = anchor, anchor.time=anchor.time,
+    fan.col = fan.col, alpha = alpha, 
+    n.fan = n.fan,
+    ln = ln,
+    med.ln = med.ln, 
+    ln.col = ln.col,
+    rlab = rlab, rpos = rpos, roffset = roffset, rcex = rcex, rcol = rcol, 
+    llab = llab, lpos = lpos, loffset = loffset, lcex = lcex, lcol = lcol, 
+    upplab = upplab, lowlab = lowlab, medlab=medlab,
+    n.spag = n.spag, 
+    space = space, 
+    add = FALSE)
+  }
+    

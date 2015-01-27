@@ -7,13 +7,13 @@
 The Split Normal Distribution (or 2 Piece Normal Distribution).
 }
 \description{
-Density, distribution function, quantile function and random generation for the split normal distribution with mean equal to \code{mean}, uncertainty indicator equal to \code{sd} and inverse skewness equal to \code{skew}.
+Density, distribution function, quantile function and random generation for the split normal distribution with mode equal to \code{mode}, uncertainty indicator equal to \code{sd} and inverse skewness equal to \code{skew}.
 }
 \usage{
-dsplitnorm(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
-psplitnorm(x, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
-qsplitnorm(p, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
-rsplitnorm(n, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
+dsplitnorm(x, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
+psplitnorm(x, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
+qsplitnorm(p, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
+rsplitnorm(n, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL)
 }
 \arguments{
   \item{x}{
@@ -25,8 +25,8 @@ Vector of probabilities
   \item{n}{
 Number of observations required.
 }
-  \item{mean}{
-Vector of means.
+  \item{mode}{
+Vector of modes.
 }
   \item{sd}{
 Vector of uncertainty indicators.
@@ -42,7 +42,7 @@ Vector of standard deviations for right hand side. \code{NULL} by default.
 }
 }
 \details{
-If \code{mean}, \code{sd} or \code{skew} are not specified they assume the default values of 0, 1 and 1, respectively. This results in identical values as a those obtained from a normal distribution.
+If \code{mode}, \code{sd} or \code{skew} are not specified they assume the default values of 0, 1 and 1, respectively. This results in identical values as a those obtained from a normal distribution.
 
 The probability density function is:
 \deqn{ f(x; \mu, \sigma_1, \sigma_2) = \frac{\sqrt 2}{\sqrt\pi (\sigma_1+\sigma_2)} e^{-\frac{1}{2\sigma_1^2}(x-\mu)^2}}
@@ -79,25 +79,25 @@ plot(x,dsplitnorm(x),type="l")
 lines(x,dnorm(x), lty=2, col="red", lwd=5)
 
 #add positive skew
-lines(x,dsplitnorm(x,mean=0,sd=1,skew=0.8))
+lines(x,dsplitnorm(x, mode=0, sd=1, skew=0.8))
 
 #add negative skew
-lines(x,dsplitnorm(x,mean=0,sd=1,skew=-0.5))
+lines(x,dsplitnorm(x, mode=0, sd=1, skew=-0.5))
 
 #add left and right hand sd
-lines(x,dsplitnorm(x,mean=0,sd1=1,sd2=2), col="blue")
+lines(x,dsplitnorm(x, mode=0, sd1=1, sd2=2), col="blue")
 
 #psplitnorm
 x<-seq(-5,5,length=100)
 plot(x,pnorm(x),type="l")
-lines(x,psplitnorm(x, skew=-0.9), col="red")
+lines(x, psplitnorm(x, skew=-0.9), col="red")
 
 #qsplitnorm
 x<-seq(0,1,length=100)
 plot(qnorm(x),type="l",x)
-lines(qsplitnorm(x),x, lty=2, col="blue")
-lines(qsplitnorm(x, skew=-0.3),x, col="red")
+lines(qsplitnorm(x), x, lty=2, col="blue")
+lines(qsplitnorm(x, skew=-0.3), x, col="red")
 
 #rsplitnorm
-hist(rsplitnorm(n=10000, mean=1, sd=1, skew=0.9),100)
+hist(rsplitnorm(n=10000, mode=1, sd=1, skew=0.9),100)
 }

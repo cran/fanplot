@@ -1,10 +1,10 @@
 qsplitnorm <-
-function(p, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
-  n <- max(length(p),length(mean),length(sd),length(skew),length(sd1),length(sd2))
+function(p, mode = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
+  n <- max(length(p),length(mode),length(sd),length(skew),length(sd1),length(sd2))
   if(length(p)<n)
     p[1:n]<-p
-  if(length(mean)<n)
-    mean[1:n]<-mean
+  if(length(mode)<n)
+    mode[1:n]<-mode
   if(length(sd)<n)
     sd[1:n]<-sd
   if(length(skew)<n)
@@ -33,10 +33,10 @@ function(p, mean = 0, sd = 1, skew = 0, sd1 = NULL, sd2 = NULL) {
   #change name of p to match formula
   alpha <- p
   #p in formula is from psplitnorm. replace.
-  p <- psplitnorm(mean, mean = mean, sd1 = sd1, sd2 = sd2) 
+  p <- psplitnorm(mode, mode = mode, sd1 = sd1, sd2 = sd2) 
   alpha1 <- alpha <= p
   alpha2 <- alpha > p
-  f[alpha1] <- (mean[alpha1] + sd1[alpha1] * qnorm( alpha[alpha1]/(c[alpha1] * sqrt(2 * pi) * sd1[alpha1])))
-  f[alpha2] <- (mean[alpha2] + sd2[alpha2] * qnorm((alpha[alpha2]+ c[alpha2] * sqrt(2 * pi) * sd2[alpha2] - 1)/(c[alpha2] * sqrt(2 * pi) * sd2[alpha2])))
+  f[alpha1] <- (mode[alpha1] + sd1[alpha1] * qnorm( alpha[alpha1]/(c[alpha1] * sqrt(2 * pi) * sd1[alpha1])))
+  f[alpha2] <- (mode[alpha2] + sd2[alpha2] * qnorm((alpha[alpha2]+ c[alpha2] * sqrt(2 * pi) * sd2[alpha2] - 1)/(c[alpha2] * sqrt(2 * pi) * sd2[alpha2])))
   f
 }

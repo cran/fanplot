@@ -13,13 +13,13 @@ Numerical parameters for inflation report of the Bank of England used to specify
   \describe{
     \item{\code{time0}}{Publication time of parameters}
     \item{\code{time}}{Future time of projected parameter}
-    \item{\code{mean}}{Mean parameter of split-normal distribution}
+    \item{\code{mode}}{Central location parameter of split-normal distribution}
     \item{\code{uncertainty}}{Uncertainty parameter of split-normal distribution}
     \item{\code{skew}}{Skew parameter of split-normal distribution}
   }
 }
 \details{
-Mean, uncertainty and skew parameters relate to those given in \code{\link{dsplitnorm}}, where uncertainty is the standard deviation.
+mode, uncertainty and skew parameters relate to those given in \code{\link{dsplitnorm}}, where uncertainty is the standard deviation.
 }
 \source{
 Bank of England Inflation Report November 2013. Retrieved from "Parameters for MPC CPI Inflation Projections from February 2004" spreadsheet at:
@@ -42,7 +42,7 @@ p <- c(0.01, p, 0.99)
 #estimate percentiles for future time period
 pp <- matrix(NA, nrow = length(p), ncol = k)
 for (i in 1:k)
-  pp[, i] <- qsplitnorm(p, mean = boe0$mean[i], sd = boe0$uncertainty[i], skew = boe0$skew[i])
+  pp[, i] <- qsplitnorm(p, mode = boe0$mode[i], sd = boe0$uncertainty[i], skew = boe0$skew[i])
 pp
 
 #plot cpi
@@ -80,7 +80,7 @@ p <- seq(0.2, 0.8, 0.2)
 p <- c(0.05, p, 0.95)
 pp <- matrix(NA, nrow = length(p), ncol = k)
 for (i in 1:k)
-  pp[, i] <- qsplitnorm(p, mean = boe0$mean[i], sd = boe0$uncertainty[i], skew = boe0$skew[i])
+  pp[, i] <- qsplitnorm(p, mode = boe0$mode[i], sd = boe0$uncertainty[i], skew = boe0$skew[i])
 pp
 
 #define prediction intervals for labels
