@@ -2,7 +2,7 @@ Package: fanplot
 Type: Package
 Title: Visualisation of Sequential Probability Distributions Using Fan
         Charts
-Version: 3.4.0
+Version: 3.4.1
 Author: Guy J. Abel
 Maintainer: "Guy J. Abel" <g.j.abel@gmail.com>
 Description: Visualise sequential distributions using a range of plotting
@@ -15,9 +15,9 @@ Description: Visualise sequential distributions using a range of plotting
 License: GPL-2
 URL: http://gjabel.wordpress.com/category/r/fanplot/
 Depends: R (>= 2.10)
-Suggests: shiny, tsbugs
+Suggests: shiny, tsbugs,
 LazyData: true
-Packaged: 2015-01-27 22:35:21 UTC; gabel
 NeedsCompilation: no
+Packaged: 2015-10-07 14:37:14 UTC; gabel
 Repository: CRAN
-Date/Publication: 2015-01-28 07:41:47
+Date/Publication: 2015-10-07 22:43:43
