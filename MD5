@@ -1,7 +1,7 @@
-ed1a5a509488046f6762601ba338fa54 *DESCRIPTION
-b91096438a94c167821a5b0f33bafd79 *NAMESPACE
+d37266d659d9e92ff1e4dd961ccf66e1 *DESCRIPTION
+f99153790e8f395944f60fa23d80d64e *NAMESPACE
 6dfb5dced8d22f47c683ef7fe351a9dc *R/dsplitnorm.R
-cecdc10ece4b6c009be563fbc2f2cbbc *R/fan.R
+12c5bc157e7731ea5dead91a4dca1b0e *R/fan.R
 2faf68b550e4f9ab802b4915bf88341a *R/fan0.R
 6125800f068236166f4ce8d3cb8c14d9 *R/psplitnorm.R
 fde05090025891db76f182bdac612669 *R/qsplitnorm.R
@@ -14,7 +14,7 @@ f083935bd74f28a43c9389aaeda6550d *data/thmcmc.RData
 bf5b210f13f20d9f1633bf2eb3c85a5b *demo/00Index
 683eaecee9545f978f4279736328f333 *demo/net_elicit.R
 3df588e874c3395e33670feecfb84532 *demo/sv_fan.R
-9d7f1dc67227ea9ffcfaae846dda9e8f *inst/CITATION
+37e8d643799c9a9759d38c3811a5f320 *inst/CITATION
 4d284100e13597dfee737b031daa3381 *inst/model/my1.R
 bc8f563c5b65e4e5330b09621323ef73 *inst/netelicit/server.R
 51d54674f743b41d26d3b6cd2644e331 *inst/netelicit/ui.R
@@ -22,6 +22,6 @@ bc8f563c5b65e4e5330b09621323ef73 *inst/netelicit/server.R
 9e2a21977652ce7cf50d5cbbf57efb36 *man/cpi.Rd
 cefa1512d5768421b7dd46ac2ce9b4aa *man/dsplitnorm.Rd
 dfff4e29a555d85c56ccbef3151b1a48 *man/fan.Rd
-7315f0ca70885f9fe593da3693be55a6 *man/fanplot-pacakge.Rd
+7394bbcf9ce4235676f59144f9e9adda *man/fanplot-pacakge.Rd
 ce562e57882dbc2d6a007eac502b956d *man/ips.Rd
 02f82f69ffcdf06b9794fd2e5e2f9b63 *man/th.mcmc.Rd
